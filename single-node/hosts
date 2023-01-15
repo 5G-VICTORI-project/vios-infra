@@ -1,0 +1,6 @@
+[computenodes]
+10.100.19.17
+
+[computenodes:vars]
+ansible_connection=ssh
+ansible_user=ubuntu

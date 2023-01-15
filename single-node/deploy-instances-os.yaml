@@ -1,0 +1,99 @@
+- hosts:
+  - localhost
+  vars_files:
+    - settings.yaml
+  gather_facts: false
+  tasks:
+#    - name: creating network
+#      os_network:
+#        state: present
+#        name: "{{ cloud_profile.os_network_name }}"
+#        external: true
+#
+#    - name: creating subnet
+#      os_subnet:
+#        state: present
+#        network_name: "{{ cloud_profile.os_network_name }}"
+#        name: "{{ cloud_profile.os_network_name }}"
+#        cidr: "{{ cluster.cluster_cidr }}"
+#        enable_dhcp: "{{ cluster.enable_dhcp }}"
+#        dns_nameservers: "{{ cluster.dns_nameservers }}"
+
+#    - name: Creating security group
+#      tags: bootstrap
+#      os_security_group:
+#        name: "{{ cloud_profile.os_network_name }}"
+#        description: security group for 5g-vios
+#        state: present
+#
+#    - name: Allowing SSH to master from anywhere IPv4
+#      tags: bootstrap
+#      os_security_group_rule:
+#        security_group: "{{ cloud_profile.os_network_name }}"
+#        protocol: tcp
+#        port_range_min: 22
+#        port_range_max: 22
+#        remote_ip_prefix: 0.0.0.0/0
+#
+#    - name: Allowing K8S API to master from anywhere IPv4
+#      tags: bootstrap
+#      os_security_group_rule:
+#        security_group: "{{ cloud_profile.os_network_name }}"
+#        protocol: tcp
+#        port_range_min: 6443
+#        port_range_max: 6443
+#        remote_ip_prefix: 0.0.0.0/0
+#
+#    - name: Allowing HTTP to master from anywhere IPv4
+#      tags: bootstrap
+#      os_security_group_rule:
+#        security_group: "{{ cloud_profile.os_network_name }}"
+#        protocol: tcp
+#        port_range_min: 80
+#        port_range_max: 80
+#        remote_ip_prefix: 0.0.0.0/0
+
+    - name: launching baseline instance
+      os_server:
+        state: present
+        auth:
+          auth_url: "{{ cloud_profile.os_auth_url }}"
+          username: "{{ cloud_profile.os_username }}"
+          password: "{{ cloud_profile.os_password }}"
+          project_name: "{{ cloud_profile.os_tenant_name }}"
+        name: "{{ item.name }}"
+        region_name: "{{ cloud_profile.os_region | default('') }}"
+        availability_zone: "{{ cloud_profile.os_availability_zone | default('') }}"
+        image: "{{ cloud_profile.os_image_name }}"
+        key_name: "{{ cloud_profile.os_key_name | default('') }}"
+        flavor: "{{ cloud_profile.os_flavor_name }}"
+        nics: [ { net-name: "{{ cloud_profile.os_network_name }}" } ]
+        security_groups: "{{ cloud_profile.os_security_groups | default('') }}"
+        meta: "{{ item.meta }}"
+      with_items:
+        - "{{ nodes }}"
+      when: create_nodes
+      tags:
+        - instances
+      register: "instance"
+
+    - name: Update inventory
+      add_host:
+        name: "{{ instance.results[0].server.name }}"
+        ansible_ssh_host: "{{ instance.results[0].openstack.public_v4 }}"
+        ansible_ssh_user: ubuntu
+        groupname: vios_cluster
+
+    - name: Wait during instances boot
+      tags: bootstrap
+      wait_for:
+        host: "{{ instance.results[0].openstack.public_v4 }}"
+        port: 22
+        search_regex: OpenSSH
+
+    - name: Allow SSH keys if we don't have them already
+      lineinfile:
+        dest: ~/.ssh/known_hosts
+        create: yes
+        state: present
+        line: "{{ lookup('pipe', 'ssh-keyscan ' + instance.results[0].openstack.public_v4 ) }}"
