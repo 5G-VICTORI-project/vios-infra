@@ -1,16 +1,26 @@
-- name: Add docker GPG key
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
-
-- name: Add docker repository to apt
-  apt_repository:
-    repo: deb https://download.docker.com/linux/ubuntu focal stable
-    state: present
-
-- name: Install docker
+- name: Docker | Install support packages
   apt:
-    name: "{{item}}"
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - lsb-release
+      - gnupg
+    state: latest
+    update_cache: true
+
+- name: Docker | Add docker GPG key
+  apt_key:
+    url: "{{ docker_url_apt_key }}"
+    state: present
+
+- name: Docker | Add docker repository to apt
+  apt_repository:
+    repo: "{{ docker_repository }}"
+    state: present
+
+- name: Docker | Install docker binaries
+  apt:
+    name: "{{ item }}"
     state: latest
     update_cache: yes
   loop:
@@ -18,19 +28,19 @@
     - docker-ce-cli
     - containerd.io
 
-- name: Check docker is active
+- name: Docker | Check docker is active
   service:
     name: docker
     state: started
     enabled: yes
 
-- name: Ensure group "docker" exists
+- name: Docker | Ensure group "docker" exists
   ansible.builtin.group:
     name: docker
     state: present
 
-- name: Adding ubuntu to docker group
+- name: Docker | Adding ubuntu to docker group
   user:
-    name: ubuntu
+    name: "{{ cluster_ssh_user }}"
     groups: docker
     append: yes

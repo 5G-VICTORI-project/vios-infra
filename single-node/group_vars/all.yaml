@@ -2,18 +2,25 @@
 name: vios
 cluster_name: "{{ name }}-master"
 cluster_group: "{{ name }}_cluster"
+cluster_ssh_user: ubuntu
 
-os_username: admin
-os_password: admin
-os_region: RegionOne
-os_availability_zone: nova
-os_network_name: mgmt
-os_tenant_name: admin
-os_key_name: ansible
-os_security_groups: default
-os_flavor_name: m1.small
-os_image_name: ubuntu-20_04-image
-os_auth_url: http://10.100.19.17:5000/v3/
+username: admin
+password: admin
+region: RegionOne
+availability_zone: nova
+network_name: mgmt
+tenant_name: admin
+key_name: ansible
+security_groups: default
+flavor_name: m1.small
+image_name: ubuntu-20_04-image
+auth_url: http://10.100.19.17:5000/v3/
+subnet_name: mgmt
+subnet_cidr: 10.8.10.0/24
+pod_subnet_cidr: 10.96.0.0/16
+cluster_dns_ip: 10.96.0.10
 
-ansible_host_groups_key: ansible_host_groups
-ansible_host_vars_key: ansible_host_vars
+docker_url_apt_key: "https://download.docker.com/linux/ubuntu/gpg"
+docker_repository: "deb https://download.docker.com/linux/ubuntu focal stable"
+k8s_url_apt_key: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+k8s_repository: "deb https://apt.kubernetes.io/ kubernetes-xenial main"

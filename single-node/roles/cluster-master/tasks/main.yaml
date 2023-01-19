@@ -1,45 +1,34 @@
-- name: Get cloud configuration
+- name: Cluster | Get cloud configuration
   tags: bootstrap
   os_client_config:
 
-- name: Creating openstack instance
+- name: Cluster | Creating openstack instance
   os_server:
     auth:
-      auth_url: "{{ os_auth_url }}"
-      username: "{{ os_username }}"
-      password: "{{ os_password }}"
-      project_name: "{{ os_tenant_name }}"
+      auth_url: "{{ auth_url }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      project_name: "{{ tenant_name }}"
     name: "{{ cluster_name }}"
-    region_name: "{{ os_region | default('') }}"
-    availability_zone: "{{ os_availability_zone | default('') }}"
-    image: "{{ os_image_name }}"
-    key_name: "{{ os_key_name | default('') }}"
-    flavor: "{{ os_flavor_name }}"
-    nics: [ { net-name: "{{ os_network_name }}" } ]
-    security_groups: "{{ os_security_groups | default('') }}"
-    userdata: |
-      #cloud-config
-      package_upgrade: true
-      hostname: "{{ cluster_name }}"
-      manage_etc_hosts: false
-      packages:
-        - apt-transport-https
-        - ca-certificates
-        - gunpg-agent
-        - curl
-        - software-properties-common
+    region_name: "{{ region }}"
+    availability_zone: "{{ availability_zone }}"
+    image: "{{ image_name }}"
+    key_name: "{{ key_name }}"
+    flavor: "{{ flavor_name }}"
+    nics: [ { net-name: "{{ network_name }}" } ]
+    security_groups: "{{ security_groups }}"
   when: state == "present"
   register: instance
 
-- name: Update inventory
+- name: Cluster | Update inventory
   add_host:
     name: "{{ instance.server.name }}"
     ansible_ssh_host: "{{ instance.openstack.public_v4 }}"
-    ansible_ssh_user: ubuntu
+    ansible_ssh_user: "{{ cluster_ssh_user }}"
     groupname: "{{ cluster_group }}"
   when: state == "present"
 
-- name: Wait during instances boot
+- name: Cluster | Wait during instances boot
   tags: bootstrap
   wait_for:
     host: "{{ instance.openstack.public_v4 }}"
@@ -47,10 +36,12 @@
     search_regex: OpenSSH
   when: state == "present"
 
-- name: Allow SSH keys if we don't have them already
+- name: Cluster | Allow SSH keys if we don't have them already
   lineinfile:
     dest: ~/.ssh/known_hosts
     create: yes
     state: present
     line: "{{ lookup('pipe', 'ssh-keyscan ' + instance.openstack.public_v4 ) }}"
   when: state == "present"
+
+
