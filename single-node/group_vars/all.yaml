@@ -1,0 +1,19 @@
+
+name: vios
+cluster_name: "{{ name }}-master"
+cluster_group: "{{ name }}_cluster"
+
+os_username: admin
+os_password: admin
+os_region: RegionOne
+os_availability_zone: nova
+os_network_name: mgmt
+os_tenant_name: admin
+os_key_name: ansible
+os_security_groups: default
+os_flavor_name: m1.small
+os_image_name: ubuntu-20_04-image
+os_auth_url: http://10.100.19.17:5000/v3/
+
+ansible_host_groups_key: ansible_host_groups
+ansible_host_vars_key: ansible_host_vars

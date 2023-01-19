@@ -1,0 +1,18 @@
+---
+- name: Launch vios cluster master
+  hosts: localhost
+  gather_facts: false
+  pre_tasks:
+    - name: Set variables
+      set_fact:
+        state: present
+  roles:
+    - cluster-master
+
+- name: Install docker and k8s
+  hosts: all
+  tags:
+    - bootstrap
+  become: true
+  roles:
+    - docker

@@ -1,15 +1,14 @@
 create_nodes: true
 
 nodes:
-  - name: vios-k8s-cluster
+  - name: vios-cluster
     meta:
-      ansible_host_groups: vios_k8s_cluster
+      ansible_host_groups: vios_cluster
       ansible_host_vars: ansible_user->ubuntu
 
 
-cloud_profile:
+os_profile:
   os_compute_api_version: "2.1"
-  os_ssh_user: ubuntu
   os_username: admin
   os_password: admin
   os_region: RegionOne
@@ -26,15 +25,14 @@ ansible_host_groups_key: ansible_host_groups
 ansible_host_vars_key: ansible_host_vars
 
 cluster:
+  ssh_user: viosops
   cluster_name: 5g-vios
   cluster_cidr: "10.5.10.0/24"
   networking: routed
   enable_dhcp: true
   dns_nameservers:
     - 8.8.8.8
-  node_pod_cidr:
-     vios-master1-k8s: "10.5.15.0/24"
-     vios-worker1-k8s: "10.5.16.0/24"
+  node_pod_cidr: "{{ lookup('env','POD_SUBNET_CIDR') | default('10.96.0.0/16', true) }}"
 
 k8s:
   kube_config_file: "/var/lib/kubelet/kubeconfig"
