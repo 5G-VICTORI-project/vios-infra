@@ -1,4 +1,4 @@
-- name: Docker | Install support packages
+- name: Install support packages
   apt:
     name:
       - apt-transport-https
@@ -8,17 +8,17 @@
     state: latest
     update_cache: true
 
-- name: Docker | Add docker GPG key
+- name: Add docker GPG key
   apt_key:
     url: "{{ docker_url_apt_key }}"
     state: present
 
-- name: Docker | Add docker repository to apt
+- name: Add docker repository to apt
   apt_repository:
     repo: "{{ docker_repository }}"
     state: present
 
-- name: Docker | Install docker binaries
+- name: Install docker binaries
   apt:
     name: "{{ item }}"
     state: latest
@@ -28,18 +28,18 @@
     - docker-ce-cli
     - containerd.io
 
-- name: Docker | Check docker is active
+- name: Check docker is active
   service:
     name: docker
     state: started
     enabled: yes
 
-- name: Docker | Ensure group "docker" exists
+- name: Ensure group "docker" exists
   ansible.builtin.group:
     name: docker
     state: present
 
-- name: Docker | Adding ubuntu to docker group
+- name: Adding ubuntu to docker group
   user:
     name: "{{ cluster_ssh_user }}"
     groups: docker

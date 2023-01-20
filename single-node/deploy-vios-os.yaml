@@ -1,0 +1,21 @@
+---
+- name: Setup new single node cluster
+  hosts: localhost
+  gather_facts: false
+  pre_tasks:
+    - name: Set variables
+      set_fact:
+        state: present
+  roles:
+    - config-cluster
+
+- name: Install docker and k8s packages
+  hosts: 5gvios-cluster
+  gather_facts: false
+  tags:
+    - bootstrap
+  become: true
+  roles:
+    - config-docker
+    - config-k8s
+

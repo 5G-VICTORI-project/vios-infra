@@ -1,24 +1,24 @@
+app_name: 5gvios
 
-name: vios
-cluster_name: "{{ name }}-master"
-cluster_group: "{{ name }}_cluster"
-cluster_ssh_user: ubuntu
+cloud_username: admin
+cloud_password: admin
+cloud_region: RegionOne
+cloud_availability_zone: nova
+cloud_auth_url: http://10.100.19.17:5000/v3/
+cloud_tenant_name: admin
+cloud_key_name: ansible
 
-username: admin
-password: admin
-region: RegionOne
-availability_zone: nova
-network_name: mgmt
-tenant_name: admin
-key_name: ansible
-security_groups: default
-flavor_name: m1.small
-image_name: ubuntu-20_04-image
-auth_url: http://10.100.19.17:5000/v3/
-subnet_name: mgmt
-subnet_cidr: 10.8.10.0/24
-pod_subnet_cidr: 10.96.0.0/16
+cluster_name: "{{ app_name }}-cluster"
+cluster_flavor_name: m1.small
+cluster_image_name: ubuntu-20_04-image
+cluster_network_name: mgmt
+cluster_security_groups: default
+cluster_subnet_name: mgmt
+cluster_subnet_cidr: 10.8.10.0/24
+cluster_pod_subnet_cidr: 10.96.0.0/16
 cluster_dns_ip: 10.96.0.10
+cluster_group: "{{ app_name }}_cluster"
+cluster_ssh_user: ubuntu
 
 docker_url_apt_key: "https://download.docker.com/linux/ubuntu/gpg"
 docker_repository: "deb https://download.docker.com/linux/ubuntu focal stable"
