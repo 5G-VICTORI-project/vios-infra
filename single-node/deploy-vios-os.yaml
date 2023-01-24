@@ -9,13 +9,14 @@
   roles:
     - config-cluster
 
-- name: Install docker and k8s packages
-  hosts: 5gvios-cluster
+- name: Install dependencies on cluster
+  hosts: vios-cluster
   gather_facts: false
   tags:
     - bootstrap
-  become: true
+  become: yes
   roles:
+    - config-prerequisites
     - config-docker
     - config-k8s
 

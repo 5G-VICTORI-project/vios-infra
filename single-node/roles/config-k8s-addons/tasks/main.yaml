@@ -1,0 +1,19 @@
+- name: Install helm
+  shell: "curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash"
+  args:
+    warn: no
+
+- name: Add repos to helm
+  command: helm repo add {{ item }}
+  when: item != ''
+  loop: "{{ helm_repos }}"
+
+- name: Add repos to helm
+  command: "helm repo add stable https://charts.helm.sh/stable"
+
+- name: Update the helm repos
+  command: helm repo update
+
+- name: kubectl apply dashboard
+  command: kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.4.0/aio/deploy/recommended.yaml
+

@@ -1,4 +1,4 @@
-- name: Creating openstack instance
+- name: Creating openstack cluster
   os_server:
     auth:
       auth_url: "{{ cloud_auth_url }}"
@@ -24,7 +24,7 @@
     groupname: "{{ cluster_group }}"
   when: state == "present"
 
-- name: Wait during instances boot
+- name: Wait for cluster to boot up
   tags: bootstrap
   wait_for:
     host: "{{ instance.openstack.public_v4 }}"
@@ -32,18 +32,13 @@
     search_regex: OpenSSH
   when: state == "present"
 
-- name: allow 'ubuntu' to use sudo without needing a password
-  lineinfile:
-    dest: /etc/sudoers
-    line: '{{cluster_ssh_user }} ALL=(ALL) NOPASSWD: ALL'
-    validate: 'visudo -cf %s'
-
-- name: Allow SSH keys if we don't have them already
+- name: Adding SSH keys if we don't have them already
   lineinfile:
     dest: ~/.ssh/known_hosts
     create: yes
     state: present
     line: "{{ lookup('pipe', 'ssh-keyscan ' + instance.openstack.public_v4 ) }}"
   when: state == "present"
+
 
 

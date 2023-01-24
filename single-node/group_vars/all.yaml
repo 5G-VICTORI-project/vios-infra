@@ -1,4 +1,4 @@
-app_name: 5gvios
+app_name: vios
 
 cloud_username: admin
 cloud_password: admin
@@ -24,3 +24,5 @@ docker_url_apt_key: "https://download.docker.com/linux/ubuntu/gpg"
 docker_repository: "deb https://download.docker.com/linux/ubuntu focal stable"
 k8s_url_apt_key: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
 k8s_repository: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+
+kubernetes_ubuntu_version: 1.21.3-00

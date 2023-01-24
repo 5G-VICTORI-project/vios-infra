@@ -1,19 +1,9 @@
-- name: Install APT Transport HTTPS
-  apt:
-    name: apt-transport-https
-    state: present
-
-- name: Disable swap
-  shell: |
-         sudo swapoff -a
-         sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
-
-- name: Set system configurations for Kubernetes networking
+- name: Set system configurations for kubernetes networking
   file:
    path: "/etc/sysctl.d/kubernetes.conf"
    state: "touch"
 
-- name: Update sysctl settings for Kubernetes networking
+- name: Update sysctl settings for kubernetes networking
   blockinfile:
    path: "/etc/sysctl.d/kubernetes.conf"
    block: |
@@ -23,32 +13,21 @@
 - name: Apply new sysctl settings
   command: sudo sysctl --system
 
-- name: Install k8s APT repo GPG key
+- name: Install kubernetes APT repo GPG key
   apt_key:
     url: "{{ k8s_url_apt_key }}"
     state: present
 
-- name: Setup k8s APT repo
+- name: Setup kubernetes APT repo
   apt_repository:
     repo: "{{ k8s_repository }}"
     state: present
 
-- name: Install Kubernetes binaries
-  apt:
-    name: "{{ packages }}"
-    state: present
-    update_cache: yes
-  vars:
-    packages:
-      - kubelet
-      - kubeadm
-      - kubectl
-
-- name: Restart kubelet
-  service:
-    name: kubelet
-    daemon_reload: yes
-    state: restarted
+- name: Install kubernetes packages
+  shell: |
+         sudo apt-get update
+         sudo apt-get install -y kubelet="{{ kubernetes_ubuntu_version }}" kubeadm="{{ kubernetes_ubuntu_version }}" kubectl="{{ kubernetes_ubuntu_version }}"
+         sudo apt-mark hold kubelet kubeadm kubectl
 
 - name: Initialize the cluster
   become: yes
@@ -68,14 +47,14 @@
 - name: Copies admin.conf to user's kube config
   copy:
     src: /etc/kubernetes/admin.conf
-    dest: $HOME/.kube/config
+    dest: /home/ubuntu/.kube/config
     remote_src: yes
-    owner: kube
+    owner: "{{ cluster_ssh_user }}"
 
 - name: Install Pod network
   become: yes
   become_user: "{{ cluster_ssh_user }}"
-  shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml >> pod_setup.txt
+  shell: kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml >> pod_setup.txt
   args:
     chdir: $HOME
     creates: pod_setup.txt
@@ -83,15 +62,18 @@
 - name: Get the token for joining the worker nodes
   become: yes
   become_user: "{{ cluster_ssh_user }}"
-  shell: kubeadm token create  --print-join-command
+  shell: kubeadm token create --print-join-command
   register: kubernetes_join_command
-
-#- debug:
-#  msg: "{{ kubernetes_join_command.stdout }}"
 
 - name: Copy join command to local file.
   become: yes
-  local_action: copy content="{{ kubernetes_join_command.stdout_lines[0] }}" dest="/tmp/kubernetes_join_command" mode=0777
+  local_action: copy content="{{ kubernetes_join_command.stdout_lines[0] }}" dest="/home/ubuntu/kubernetes_join_command" mode=0777
 
+- name: Copy default storage class configuration
+  template:
+    src: "{{ role_path }}/templates/default-storage-class.yaml.j2"
+    dest: /home/ubuntu/manifests/default-storage-class.yaml
 
+- name: Apply default storage class
+  command: kubectl apply -f /home/ubuntu/manifests/default-storage-class.yaml
 

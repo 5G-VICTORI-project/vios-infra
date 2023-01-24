@@ -1,13 +1,3 @@
-- name: Install support packages
-  apt:
-    name:
-      - apt-transport-https
-      - ca-certificates
-      - lsb-release
-      - gnupg
-    state: latest
-    update_cache: true
-
 - name: Add docker GPG key
   apt_key:
     url: "{{ docker_url_apt_key }}"
