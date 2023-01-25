@@ -15,7 +15,7 @@ cluster_network_name: mgmt
 cluster_security_groups: default
 cluster_subnet_name: mgmt
 cluster_subnet_cidr: 10.8.10.0/24
-cluster_pod_subnet_cidr: 10.96.0.0/16
+cluster_pod_subnet_cidr: 10.244.0.0/16
 cluster_dns_ip: 10.96.0.10
 cluster_group: "{{ app_name }}_cluster"
 cluster_ssh_user: ubuntu

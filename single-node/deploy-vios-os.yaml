@@ -1,5 +1,5 @@
 ---
-- name: Setup new single node cluster
+- name: Setting up new single node cluster vm
   hosts: localhost
   gather_facts: false
   pre_tasks:
@@ -9,7 +9,7 @@
   roles:
     - config-cluster
 
-- name: Install dependencies on cluster
+- name: Installing cluster components
   hosts: vios-cluster
   gather_facts: false
   tags:
@@ -18,5 +18,13 @@
   roles:
     - config-prerequisites
     - config-docker
-    - config-k8s
+    - role: config-k8s
+      vars:
+        cluster_ip: "{{ hostvars['localhost']['instance']['openstack']['public_v4'] }}"
 
+#- name: Installing vios microservices
+#  hosts: vios-cluster
+#  gather_facts: false
+#  become: yes
+#  roles:
+#    - config-vios

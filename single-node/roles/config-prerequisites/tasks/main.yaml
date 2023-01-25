@@ -1,13 +1,12 @@
-- name: Allow ssh user to use sudo without needing a password
+- name: Cluster | Adding ssh user to sudoers
   lineinfile:
     dest: /etc/sudoers
     line: '{{cluster_ssh_user }} ALL=(ALL) NOPASSWD: ALL'
     validate: 'visudo -cf %s'
 
-- name: Install support packages
+- name: Cluster | Installing support packages
   apt:
     name:
-      - nfs-kernel-server
       - apt-transport-https
       - ca-certificates
       - lsb-release
@@ -15,7 +14,7 @@
     state: latest
     update_cache: true
 
-- name: Disable swap
+- name: Cluster | Disabling swap
   shell: |
          sudo swapoff -a
          sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab

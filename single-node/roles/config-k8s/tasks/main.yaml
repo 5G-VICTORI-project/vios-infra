@@ -1,42 +1,42 @@
-- name: Set system configurations for kubernetes networking
+- name: Kubernetes | Setting system configurations for networking
   file:
    path: "/etc/sysctl.d/kubernetes.conf"
    state: "touch"
 
-- name: Update sysctl settings for kubernetes networking
+- name: Kubernetes | Updating sysctl settings for networking
   blockinfile:
    path: "/etc/sysctl.d/kubernetes.conf"
    block: |
           net.bridge.bridge-nf-call-ip6tables = 1
           net.bridge.bridge-nf-call-iptables = 1
 
-- name: Apply new sysctl settings
+- name: Kubernetes | Applying new sysctl settings
   command: sudo sysctl --system
 
-- name: Install kubernetes APT repo GPG key
+- name: Kubernetes | Installing APT repo GPG key
   apt_key:
     url: "{{ k8s_url_apt_key }}"
     state: present
 
-- name: Setup kubernetes APT repo
+- name: Kubernetes | Setting up APT repo
   apt_repository:
     repo: "{{ k8s_repository }}"
     state: present
 
-- name: Install kubernetes packages
+- name: Kubernetes | Installing packages
   shell: |
          sudo apt-get update
          sudo apt-get install -y kubelet="{{ kubernetes_ubuntu_version }}" kubeadm="{{ kubernetes_ubuntu_version }}" kubectl="{{ kubernetes_ubuntu_version }}"
          sudo apt-mark hold kubelet kubeadm kubectl
 
-- name: Initialize the cluster
+- name: Kubernetes | Initialising the cluster
   become: yes
   shell: "kubeadm init --pod-network-cidr={{ cluster_pod_subnet_cidr }} >> cluster.txt"
   args:
     chdir: $HOME
     creates: cluster.txt
 
-- name: Create .kube directory
+- name: Kubernetes | Creating .kube directory
   become: yes
   become_user: "{{ cluster_ssh_user }}"
   file:
@@ -44,14 +44,14 @@
     state: directory
     mode: 0755
 
-- name: Copies admin.conf to user's kube config
+- name: Kubernetes | Copying admin.conf to ssh user's kube config
   copy:
     src: /etc/kubernetes/admin.conf
     dest: /home/ubuntu/.kube/config
     remote_src: yes
     owner: "{{ cluster_ssh_user }}"
 
-- name: Install Pod network
+- name: Kubernetes | Installing pod network
   become: yes
   become_user: "{{ cluster_ssh_user }}"
   shell: kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml >> pod_setup.txt
@@ -59,21 +59,44 @@
     chdir: $HOME
     creates: pod_setup.txt
 
-- name: Get the token for joining the worker nodes
+- name: Kubernetes | Getting worker node token
   become: yes
   become_user: "{{ cluster_ssh_user }}"
-  shell: kubeadm token create --print-join-command
-  register: kubernetes_join_command
+  shell: kubeadm token create --print-join-command >> token.txt
 
-- name: Copy join command to local file.
+- name: Kubernetes | Copying default storage class configuration file
   become: yes
-  local_action: copy content="{{ kubernetes_join_command.stdout_lines[0] }}" dest="/home/ubuntu/kubernetes_join_command" mode=0777
-
-- name: Copy default storage class configuration
+  become_user: "{{ cluster_ssh_user }}"
   template:
     src: "{{ role_path }}/templates/default-storage-class.yaml.j2"
-    dest: /home/ubuntu/manifests/default-storage-class.yaml
+    dest: "/home/{{ cluster_ssh_user }}/default-storage-class.yaml"
 
-- name: Apply default storage class
-  command: kubectl apply -f /home/ubuntu/manifests/default-storage-class.yaml
+- name: Kubernetes | Applying default storage class
+  become: yes
+  become_user: "{{ cluster_ssh_user }}"
+  command: kubectl apply -f "/home/{{ cluster_ssh_user }}/default-storage-class.yaml"
+
+- name: Kubernetes | Copying default storage class deployment file
+  become: yes
+  become_user: "{{ cluster_ssh_user }}"
+  template:
+    src: "{{ role_path }}/templates/default-storage-class-deployment.yaml.j2"
+    dest: "/home/{{ cluster_ssh_user }}/default-storage-class-deployment.yaml"
+
+- name: Kubernetes | Applying default storage class deployment
+  become: yes
+  become_user: "{{ cluster_ssh_user }}"
+  command: kubectl apply -f "/home/{{ cluster_ssh_user }}/default-storage-class-deployment.yaml"
+
+- name: Kubernetes | Copying RBAC configuration file
+  become: yes
+  become_user: "{{ cluster_ssh_user }}"
+  template:
+    src: "{{ role_path }}/templates/rbac.yaml.j2"
+    dest: "/home/{{ cluster_ssh_user }}/rbac.yaml"
+
+- name: Kubernetes | Applying RBAC configuration
+  become: yes
+  become_user: "{{ cluster_ssh_user }}"
+  command: kubectl apply -f "/home/{{ cluster_ssh_user }}/rbac.yaml"
 

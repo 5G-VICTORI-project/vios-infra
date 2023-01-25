@@ -1,14 +1,14 @@
-- name: Add docker GPG key
+- name: Docker | Adding docker GPG key
   apt_key:
     url: "{{ docker_url_apt_key }}"
     state: present
 
-- name: Add docker repository to apt
+- name: Docker | Adding repository to apt
   apt_repository:
     repo: "{{ docker_repository }}"
     state: present
 
-- name: Install docker binaries
+- name: Docker | Installing binaries
   apt:
     name: "{{ item }}"
     state: latest
@@ -18,18 +18,18 @@
     - docker-ce-cli
     - containerd.io
 
-- name: Check docker is active
+- name: Docker | Checking docker is active
   service:
     name: docker
     state: started
     enabled: yes
 
-- name: Ensure group "docker" exists
+- name: Docker | Checking group "docker" exists
   ansible.builtin.group:
     name: docker
     state: present
 
-- name: Adding ubuntu to docker group
+- name: Docker | Adding ssh user to docker group
   user:
     name: "{{ cluster_ssh_user }}"
     groups: docker
