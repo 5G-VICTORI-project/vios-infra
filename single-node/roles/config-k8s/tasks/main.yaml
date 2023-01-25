@@ -1,14 +1,14 @@
 - name: Kubernetes | Setting system configurations for networking
   file:
-   path: "/etc/sysctl.d/kubernetes.conf"
-   state: "touch"
+    path: "/etc/sysctl.d/kubernetes.conf"
+    state: "touch"
 
 - name: Kubernetes | Updating sysctl settings for networking
   blockinfile:
-   path: "/etc/sysctl.d/kubernetes.conf"
-   block: |
-          net.bridge.bridge-nf-call-ip6tables = 1
-          net.bridge.bridge-nf-call-iptables = 1
+    path: "/etc/sysctl.d/kubernetes.conf"
+    block: |
+      net.bridge.bridge-nf-call-ip6tables = 1
+      net.bridge.bridge-nf-call-iptables = 1
 
 - name: Kubernetes | Applying new sysctl settings
   command: sudo sysctl --system
@@ -25,9 +25,9 @@
 
 - name: Kubernetes | Installing packages
   shell: |
-         sudo apt-get update
-         sudo apt-get install -y kubelet="{{ kubernetes_ubuntu_version }}" kubeadm="{{ kubernetes_ubuntu_version }}" kubectl="{{ kubernetes_ubuntu_version }}"
-         sudo apt-mark hold kubelet kubeadm kubectl
+    sudo apt-get update
+    sudo apt-get install -y kubelet="{{ kubernetes_ubuntu_version }}" kubeadm="{{ kubernetes_ubuntu_version }}" kubectl="{{ kubernetes_ubuntu_version }}"
+    sudo apt-mark hold kubelet kubeadm kubectl
 
 - name: Kubernetes | Initialising the cluster
   become: yes
@@ -99,4 +99,9 @@
   become: yes
   become_user: "{{ cluster_ssh_user }}"
   command: kubectl apply -f "/home/{{ cluster_ssh_user }}/rbac.yaml"
+
+- name: Kubernetes | Tainting the master node
+  become: yes
+  become_user: "{{ cluster_ssh_user }}"
+  command: kubectl taint nodes --all node-role.kubernetes.io/master-
 

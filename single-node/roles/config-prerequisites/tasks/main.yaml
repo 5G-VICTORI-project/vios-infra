@@ -1,7 +1,7 @@
 - name: Cluster | Adding ssh user to sudoers
   lineinfile:
     dest: /etc/sudoers
-    line: '{{cluster_ssh_user }} ALL=(ALL) NOPASSWD: ALL'
+    line: '{{ cluster_ssh_user }} ALL=(ALL) NOPASSWD: ALL'
     validate: 'visudo -cf %s'
 
 - name: Cluster | Installing support packages
@@ -16,5 +16,29 @@
 
 - name: Cluster | Disabling swap
   shell: |
-         sudo swapoff -a
-         sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+    sudo swapoff -a
+    sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+- name: Cluster | Installing nfs server
+  shell: |
+    sudo apt-get update
+    sudo apt-get install -y nfs-kernel-server
+    sudo apt-mark hold nfs-kernel-server
+
+- name: Cluster | Creating new nsf directory
+  become_user: "{{ cluster_ssh_user }}"
+  shell: |
+    sudo mkdir -p ~/nfs
+    sudo chown nobody:nogroup ~/nfs
+
+- name: Cluster | Creating nfs export file
+  become_user: "{{ cluster_ssh_user }}"
+  lineinfile:
+    path: /etc/export
+    line: "/nfs *(rw,sync,no_subtree_check,no_root_squash,no_all_squash,insecure)"
+    state: present
+
+- name: Cluster | Starting nfs server
+  become_user: "{{ cluster_ssh_user }}"
+  shell: |
+    sudo systemctl enable --now nfs-server

@@ -9,18 +9,24 @@
   roles:
     - config-cluster
 
-- name: Installing cluster components
+- name: Running cluster prerequistes
   hosts: vios-cluster
   gather_facts: false
-  tags:
-    - bootstrap
   become: yes
   roles:
     - config-prerequisites
-    - config-docker
-    - role: config-k8s
-      vars:
-        cluster_ip: "{{ hostvars['localhost']['instance']['openstack']['public_v4'] }}"
+
+#- name: Installing docker and kubernetes
+#  hosts: vios-cluster
+#  gather_facts: false
+#  tags:
+#    - bootstrap
+#  become: yes
+#  roles:
+#    - config-docker
+#    - role: config-k8s
+#      vars:
+#        cluster_ip: "{{ hostvars['localhost']['instance']['openstack']['public_v4'] }}"
 
 #- name: Installing vios microservices
 #  hosts: vios-cluster
