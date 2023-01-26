@@ -8,16 +8,17 @@ cloud_auth_url: http://10.100.19.17:5000/v3/
 cloud_tenant_name: admin
 cloud_key_name: ansible
 
-cluster_name: "{{ app_name }}-cluster"
-cluster_flavor_name: m1.small
-cluster_image_name: ubuntu-20_04-image
+master_name: "{{ app_name }}-master"
+master_flavor_name: m1.small
+master_image_name: ubuntu-20_04-image
+
 cluster_network_name: mgmt
 cluster_security_groups: default
 cluster_subnet_name: mgmt
 cluster_subnet_cidr: 10.8.10.0/24
 cluster_pod_subnet_cidr: 10.244.0.0/16
 cluster_dns_ip: 10.96.0.10
-cluster_group: "{{ app_name }}_cluster"
+cluster_group: "{{ app_name }}_master"
 cluster_ssh_user: ubuntu
 
 docker_url_apt_key: "https://download.docker.com/linux/ubuntu/gpg"

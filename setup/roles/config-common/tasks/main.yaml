@@ -1,0 +1,112 @@
+- name: Adding ssh user to sudoers
+  lineinfile:
+    dest: /etc/sudoers
+    line: '{{ cluster_ssh_user }} ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: Installing common support packages
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - lsb-release
+      - gnupg
+    state: latest
+    update_cache: true
+
+- name: Disabling swap
+  shell: |
+    sudo swapoff -a
+    sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+#- name: Installing nfs server
+#  shell: |
+#    sudo apt-get update
+#    sudo apt-get install -y nfs-kernel-server
+#    sudo apt-mark hold nfs-kernel-server
+#
+#- name: Creating new nsf directory
+#  become_user: "{{ cluster_ssh_user }}"
+#  shell: |
+#    sudo mkdir -p ~/nfs
+#    sudo chown nobody:nogroup ~/nfs
+#
+#- name: Creating nfs export file
+#  become_user: "{{ cluster_ssh_user }}"
+#  lineinfile:
+#    path: /etc/export
+#    line: "/nfs *(rw,sync,no_subtree_check,no_root_squash,no_all_squash,insecure)"
+#    state: present
+#
+#- name: Starting nfs server
+#  become_user: "{{ cluster_ssh_user }}"
+#  shell: |
+#    sudo systemctl enable --now nfs-server
+
+- name: Adding docker GPG key
+  apt_key:
+    url: "{{ docker_url_apt_key }}"
+    state: present
+
+- name: Adding docker repository to apt
+  apt_repository:
+    repo: "{{ docker_repository }}"
+    state: present
+
+- name: Installing docker
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  loop:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+
+- name: Checking docker is active
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Checking group "docker" exists
+  ansible.builtin.group:
+    name: docker
+    state: present
+
+- name: Adding ssh user to docker group
+  user:
+    name: "{{ cluster_ssh_user }}"
+    groups: docker
+    append: yes
+
+- name: Setting system configurations for kubernetes networking
+  file:
+    path: "/etc/sysctl.d/kubernetes.conf"
+    state: "touch"
+
+- name: Updating sysctl settings for kubernetes networking
+  blockinfile:
+    path: "/etc/sysctl.d/kubernetes.conf"
+    block: |
+      net.bridge.bridge-nf-call-ip6tables = 1
+      net.bridge.bridge-nf-call-iptables = 1
+
+- name: Applying new sysctl settings
+  command: sudo sysctl --system
+
+- name: Adding kubernetes GPG key
+  apt_key:
+    url: "{{ k8s_url_apt_key }}"
+    state: present
+
+- name: Adding kubernetes repository to apt
+  apt_repository:
+    repo: "{{ k8s_repository }}"
+    state: present
+
+- name: Installing kubernetes
+  shell: |
+    sudo apt-get update
+    sudo apt-get install -y kubelet="{{ kubernetes_ubuntu_version }}" kubeadm="{{ kubernetes_ubuntu_version }}" kubectl="{{ kubernetes_ubuntu_version }}"
+    sudo apt-mark hold kubelet kubeadm kubectl

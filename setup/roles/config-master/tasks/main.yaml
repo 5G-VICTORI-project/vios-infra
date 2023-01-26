@@ -1,57 +1,25 @@
-- name: Kubernetes | Setting system configurations for networking
-  file:
-    path: "/etc/sysctl.d/kubernetes.conf"
-    state: "touch"
-
-- name: Kubernetes | Updating sysctl settings for networking
-  blockinfile:
-    path: "/etc/sysctl.d/kubernetes.conf"
-    block: |
-      net.bridge.bridge-nf-call-ip6tables = 1
-      net.bridge.bridge-nf-call-iptables = 1
-
-- name: Kubernetes | Applying new sysctl settings
-  command: sudo sysctl --system
-
-- name: Kubernetes | Installing APT repo GPG key
-  apt_key:
-    url: "{{ k8s_url_apt_key }}"
-    state: present
-
-- name: Kubernetes | Setting up APT repo
-  apt_repository:
-    repo: "{{ k8s_repository }}"
-    state: present
-
-- name: Kubernetes | Installing packages
-  shell: |
-    sudo apt-get update
-    sudo apt-get install -y kubelet="{{ kubernetes_ubuntu_version }}" kubeadm="{{ kubernetes_ubuntu_version }}" kubectl="{{ kubernetes_ubuntu_version }}"
-    sudo apt-mark hold kubelet kubeadm kubectl
-
-- name: Kubernetes | Initialising the cluster
+- name: Initialising the kubernetes cluster
   become: yes
   shell: "kubeadm init --pod-network-cidr={{ cluster_pod_subnet_cidr }} >> cluster.txt"
   args:
     chdir: $HOME
     creates: cluster.txt
 
-- name: Kubernetes | Creating .kube directory
-  become: yes
+- name: Creating .kube directory for ssh user
   become_user: "{{ cluster_ssh_user }}"
   file:
     path: $HOME/.kube
     state: directory
     mode: 0755
 
-- name: Kubernetes | Copying admin.conf to ssh user's kube config
+- name: Copying admin.conf to ssh user's kube config
   copy:
     src: /etc/kubernetes/admin.conf
     dest: /home/ubuntu/.kube/config
     remote_src: yes
     owner: "{{ cluster_ssh_user }}"
 
-- name: Kubernetes | Installing pod network
+- name: Installing kubernetes pod network
   become: yes
   become_user: "{{ cluster_ssh_user }}"
   shell: kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml >> pod_setup.txt
@@ -59,49 +27,70 @@
     chdir: $HOME
     creates: pod_setup.txt
 
-- name: Kubernetes | Getting worker node token
+- name: Getting kubernetes worker node token
   become: yes
   become_user: "{{ cluster_ssh_user }}"
   shell: kubeadm token create --print-join-command >> token.txt
 
-- name: Kubernetes | Copying default storage class configuration file
+- name: Copying default kubernetes storage class configuration file
   become: yes
   become_user: "{{ cluster_ssh_user }}"
   template:
     src: "{{ role_path }}/templates/default-storage-class.yaml.j2"
     dest: "/home/{{ cluster_ssh_user }}/default-storage-class.yaml"
 
-- name: Kubernetes | Applying default storage class
+- name: Applying default kubernetes storage class
   become: yes
   become_user: "{{ cluster_ssh_user }}"
   command: kubectl apply -f "/home/{{ cluster_ssh_user }}/default-storage-class.yaml"
 
-- name: Kubernetes | Copying default storage class deployment file
+- name: Copying default kubernetes storage class deployment file
   become: yes
   become_user: "{{ cluster_ssh_user }}"
   template:
     src: "{{ role_path }}/templates/default-storage-class-deployment.yaml.j2"
     dest: "/home/{{ cluster_ssh_user }}/default-storage-class-deployment.yaml"
 
-- name: Kubernetes | Applying default storage class deployment
+- name: Applying default kubernetes storage class deployment
   become: yes
   become_user: "{{ cluster_ssh_user }}"
   command: kubectl apply -f "/home/{{ cluster_ssh_user }}/default-storage-class-deployment.yaml"
 
-- name: Kubernetes | Copying RBAC configuration file
+- name: Copying kubernetes RBAC configuration file
   become: yes
   become_user: "{{ cluster_ssh_user }}"
   template:
     src: "{{ role_path }}/templates/rbac.yaml.j2"
     dest: "/home/{{ cluster_ssh_user }}/rbac.yaml"
 
-- name: Kubernetes | Applying RBAC configuration
+- name: Applying kubernetes RBAC configuration
   become: yes
   become_user: "{{ cluster_ssh_user }}"
   command: kubectl apply -f "/home/{{ cluster_ssh_user }}/rbac.yaml"
 
-- name: Kubernetes | Tainting the master node
+- name: Tainting the kubernetes master node
   become: yes
   become_user: "{{ cluster_ssh_user }}"
   command: kubectl taint nodes --all node-role.kubernetes.io/master-
 
+- name: Installing kubernetes dashboard
+  become: yes
+  become_user: "{{ cluster_ssh_user }}"
+  command: kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+
+- name: Copying kubernetes dashboard admin user deployment file
+  become: yes
+  become_user: "{{ cluster_ssh_user }}"
+  template:
+    src: "{{ role_path }}/templates/dashboard-adminuser.yaml.j2"
+    dest: "/home/{{ cluster_ssh_user }}/dashboard-adminuser.yaml"
+
+- name: Applying kubernetes dashboard admin user deployment file
+  become: yes
+  become_user: "{{ cluster_ssh_user }}"
+  command: kubectl apply -f "/home/{{ cluster_ssh_user }}/dashboard-adminuser.yaml"
+
+- name: Getting a bearer token for kubernetes dashboard admin user
+  become: yes
+  become_user: "{{ cluster_ssh_user }}"
+  command: kubectl -n kubernetes-dashboard create token admin-user >> dashboard-adminuser-token.txt

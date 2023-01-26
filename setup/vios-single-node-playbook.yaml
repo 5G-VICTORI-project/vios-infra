@@ -1,0 +1,29 @@
+---
+- name: Creating new master node vm
+  hosts: localhost
+  gather_facts: false
+  pre_tasks:
+    - name: Set variables
+      set_fact:
+        state: present
+  roles:
+    - create-master
+
+- name: Configuring master node
+  hosts: vios-master
+  gather_facts: false
+  tags:
+    - bootstrap
+  become: yes
+  roles:
+    - config-common
+    - role: config-master
+      vars:
+        cluster_ip: "{{ hostvars['localhost']['instance']['openstack']['public_v4'] }}"
+
+#- name: Installing vios microservices
+#  hosts: vios-cluster
+#  gather_facts: false
+#  become: yes
+#  roles:
+#    - config-vios

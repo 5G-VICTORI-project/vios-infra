@@ -1,22 +1,22 @@
-- name: Cluster | Creating openstack cluster
+- name: Creating master node
   os_server:
     auth:
       auth_url: "{{ cloud_auth_url }}"
       username: "{{ cloud_username }}"
       password: "{{ cloud_password }}"
       project_name: "{{ cloud_tenant_name }}"
-    name: "{{ cluster_name }}"
+    name: "{{ master_name }}"
     region_name: "{{ cloud_region }}"
     availability_zone: "{{ cloud_availability_zone }}"
-    image: "{{ cluster_image_name }}"
+    image: "{{ master_image_name }}"
     key_name: "{{ cloud_key_name }}"
-    flavor: "{{ cluster_flavor_name }}"
+    flavor: "{{ master_flavor_name }}"
     nics: [ { net-name: "{{ cluster_network_name }}" } ]
     security_groups: "{{ cluster_security_groups }}"
   when: state == "present"
   register: instance
 
-- name: Cluster | Updating inventory
+- name: Updating ansible inventory
   add_host:
     name: "{{ instance.server.name }}"
     ansible_ssh_host: "{{ instance.openstack.public_v4 }}"
@@ -24,7 +24,7 @@
     groupname: "{{ cluster_group }}"
   when: state == "present"
 
-- name: Cluster | Waiting for cluster to boot up
+- name: Waiting for master node to boot up
   tags: bootstrap
   wait_for:
     host: "{{ instance.openstack.public_v4 }}"
@@ -32,7 +32,7 @@
     search_regex: OpenSSH
   when: state == "present"
 
-- name: Cluster | Adding SSH keys if we don't have them already
+- name: Adding SSH keys to access master node
   lineinfile:
     dest: ~/.ssh/known_hosts
     create: yes
