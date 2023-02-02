@@ -8,7 +8,7 @@ cloud_auth_url: http://10.100.19.17:5000/v3/
 cloud_tenant_name: admin
 cloud_key_name: ansible
 
-master_name: "{{ app_name }}-master"
+master_name: "{{ app_name }}-master1"
 master_flavor_name: m1.small
 master_image_name: ubuntu-20_04-image
 
@@ -25,5 +25,9 @@ docker_url_apt_key: "https://download.docker.com/linux/ubuntu/gpg"
 docker_repository: "deb https://download.docker.com/linux/ubuntu focal stable"
 k8s_url_apt_key: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
 k8s_repository: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+
+helm_version: v3.11.0
+helm_url: "https://get.helm.sh/helm-{{ helm_version }}-linux-amd64.tar.gz"
+helm_bin_dir: /opt/bin
 
 kubernetes_ubuntu_version: 1.21.3-00

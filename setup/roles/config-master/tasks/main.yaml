@@ -1,8 +1,38 @@
+- name: Installing nfs server
+  shell: |
+    sudo apt-get update
+    sudo apt-get install -y nfs-kernel-server
+    sudo apt-mark hold nfs-kernel-server
+
+- name: Creating new nsf directory
+  shell: |
+    sudo mkdir -p /nfs
+    sudo chown nobody:nogroup /nfs
+
+- name: Creating empty nsf export file
+  file:
+    path: "/etc/exports"
+    state: "touch"
+
+- name: Adding content to nfs export file
+  lineinfile:
+    path: /etc/exports
+    line: "/nfs *(rw,sync,no_subtree_check,no_root_squash,no_all_squash,insecure)"
+    state: present
+
+- name: Starting nfs server
+  shell: |
+    sudo systemctl enable --now nfs-server
+
+- name: Re-exporting nfs location
+  shell: |
+    sudo exportfs -ra   
+
 - name: Initialising the kubernetes cluster
   become: yes
-  shell: "kubeadm init --pod-network-cidr={{ cluster_pod_subnet_cidr }} >> cluster.txt"
+  shell: "kubeadm init --pod-network-cidr={{ cluster_pod_subnet_cidr }} >> cluster_setup.txt"
   args:
-    chdir: $HOME
+    chdir: /home/ubuntu
     creates: cluster.txt
 
 - name: Creating .kube directory for ssh user
@@ -30,7 +60,7 @@
 - name: Getting kubernetes worker node token
   become: yes
   become_user: "{{ cluster_ssh_user }}"
-  shell: kubeadm token create --print-join-command >> token.txt
+  shell: kubeadm token create --print-join-command >> node_join_token.txt
 
 - name: Copying default kubernetes storage class configuration file
   become: yes
@@ -93,4 +123,14 @@
 - name: Getting a bearer token for kubernetes dashboard admin user
   become: yes
   become_user: "{{ cluster_ssh_user }}"
-  command: kubectl -n kubernetes-dashboard create token admin-user >> dashboard-adminuser-token.txt
+  shell: "kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}') >> dashboard_admin_token.txt"
+
+- name: Cleaning up deployment files
+  file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+    - "/home/{{ cluster_ssh_user }}/dashboard-adminuser.yaml"
+    - "/home/{{ cluster_ssh_user }}/default-storage-class-deployment.yaml"
+    - "/home/{{ cluster_ssh_user }}/default-storage-class.yaml"
+    - "/home/{{ cluster_ssh_user }}/rbac.yaml"

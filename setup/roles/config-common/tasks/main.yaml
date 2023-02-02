@@ -19,30 +19,6 @@
     sudo swapoff -a
     sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 
-#- name: Installing nfs server
-#  shell: |
-#    sudo apt-get update
-#    sudo apt-get install -y nfs-kernel-server
-#    sudo apt-mark hold nfs-kernel-server
-#
-#- name: Creating new nsf directory
-#  become_user: "{{ cluster_ssh_user }}"
-#  shell: |
-#    sudo mkdir -p ~/nfs
-#    sudo chown nobody:nogroup ~/nfs
-#
-#- name: Creating nfs export file
-#  become_user: "{{ cluster_ssh_user }}"
-#  lineinfile:
-#    path: /etc/export
-#    line: "/nfs *(rw,sync,no_subtree_check,no_root_squash,no_all_squash,insecure)"
-#    state: present
-#
-#- name: Starting nfs server
-#  become_user: "{{ cluster_ssh_user }}"
-#  shell: |
-#    sudo systemctl enable --now nfs-server
-
 - name: Adding docker GPG key
   apt_key:
     url: "{{ docker_url_apt_key }}"
@@ -110,3 +86,28 @@
     sudo apt-get update
     sudo apt-get install -y kubelet="{{ kubernetes_ubuntu_version }}" kubeadm="{{ kubernetes_ubuntu_version }}" kubectl="{{ kubernetes_ubuntu_version }}"
     sudo apt-mark hold kubelet kubeadm kubectl
+
+- name: Downloading helm
+  unarchive:
+    src: "{{ helm_url }}"
+    dest: /tmp
+    copy: no
+  tags: download
+
+- name: create the helm installation directory
+  file:
+    path: "{{ helm_bin_dir }}"
+    state: directory
+
+- name: copy helm binary
+  copy:
+    src: /tmp/linux-amd64/helm
+    dest: "{{ helm_bin_dir }}"
+    mode: 0755
+    remote_src: yes
+
+- name: create helm soft link
+  file:
+    src: "{{ helm_bin_dir }}/helm"
+    dest: "/usr/bin/helm"
+    state: link

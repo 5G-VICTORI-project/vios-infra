@@ -10,7 +10,7 @@
     - create-master
 
 - name: Configuring master node
-  hosts: vios-master
+  hosts: vios-master1
   gather_facts: false
   tags:
     - bootstrap
