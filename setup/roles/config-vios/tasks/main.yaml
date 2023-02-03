@@ -1,0 +1,11 @@
+- name: Creating a k8s namespace
+  k8s:
+    name: 5g-vios
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Add helm repo
+  helm_repository:
+      name: servicebroker
+      repo_url: "{{ helm_chart_url }}"
