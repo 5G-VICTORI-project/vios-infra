@@ -29,5 +29,6 @@ k8s_repository: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
 helm_version: v3.11.0
 helm_url: "https://get.helm.sh/helm-{{ helm_version }}-linux-amd64.tar.gz"
 helm_bin_dir: /opt/bin
+helm_chart_sbr_url: "https://github.com/5G-VICTORI-project/vios-infra.git"
 
 kubernetes_ubuntu_version: 1.21.3-00
