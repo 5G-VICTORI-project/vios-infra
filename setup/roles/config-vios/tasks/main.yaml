@@ -10,13 +10,13 @@
     name: vios-charts
     repo_url: "{{ helm_chart_url }}"
 
-- name: Installing the ServerBroker
+- name: Installing the ServiceBroker
   kubernetes.core.helm:
     name: servicebroker
     namespace: 5g-vios
     chart_ref: vios-charts/servicebroker
 
-- name: Installing the ServerManager
+- name: Installing the ServiceManager
   kubernetes.core.helm:
     name: servicemanager
     namespace: 5g-vios
@@ -27,3 +27,15 @@
     name: apigateway
     namespace: 5g-vios
     chart_ref: vios-charts/apigateway
+
+- name: Installing the MobilityManager
+  kubernetes.core.helm:
+    name: mobilitymanager
+    namespace: 5g-vios
+    chart_ref: vios-charts/mobilitymanager
+
+- name: Installing the Repository
+  kubernetes.core.helm:
+    name: repository
+    namespace: 5g-vios
+    chart_ref: vios-charts/repository
