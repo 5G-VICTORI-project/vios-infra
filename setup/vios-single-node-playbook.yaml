@@ -21,9 +21,10 @@
       vars:
         cluster_ip: "{{ hostvars['localhost']['instance']['openstack']['public_v4'] }}"
 
-#- name: Installing vios microservices
-#  hosts: vios-cluster
-#  gather_facts: false
-#  become: yes
-#  roles:
-#    - config-vios
+- name: Installing vios microservices
+  hosts: vios-master1
+  gather_facts: false
+  environment:
+    K8S_AUTH_KUBECONFIG: "~/.kube/config"
+  roles:
+    - config-vios

@@ -11,6 +11,7 @@
       - ca-certificates
       - lsb-release
       - gnupg
+      - python3-pip
     state: latest
     update_cache: true
 
@@ -94,20 +95,24 @@
     copy: no
   tags: download
 
-- name: create the helm installation directory
+- name: Creating the helm installation directory
   file:
     path: "{{ helm_bin_dir }}"
     state: directory
 
-- name: copy helm binary
+- name: Copying helm binary
   copy:
     src: /tmp/linux-amd64/helm
     dest: "{{ helm_bin_dir }}"
     mode: 0755
     remote_src: yes
 
-- name: create helm soft link
+- name: Creating helm soft link
   file:
     src: "{{ helm_bin_dir }}/helm"
     dest: "/usr/bin/helm"
     state: link
+
+- name: Installing kubernetes python package
+  pip:
+    name: kubernetes

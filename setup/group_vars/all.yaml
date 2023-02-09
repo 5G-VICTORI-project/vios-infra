@@ -1,11 +1,11 @@
 app_name: vios
 
-cloud_username: admin
-cloud_password: admin
+cloud_username: "{{ lookup('env','CLOUD_USERNAME') }}"
+cloud_password: "{{ lookup('env','CLOUD_PASSWORD') }}"
 cloud_region: RegionOne
 cloud_availability_zone: nova
-cloud_auth_url: http://10.100.19.17:5000/v3/
-cloud_tenant_name: admin
+cloud_auth_url: "{{ lookup('env','CLOUD_AUTH_URL') }}"
+cloud_tenant_name: "{{ lookup('env','CLOUD_TENANT_NAME') }}"
 cloud_key_name: ansible
 
 master_name: "{{ app_name }}-master1"
@@ -29,6 +29,6 @@ k8s_repository: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
 helm_version: v3.11.0
 helm_url: "https://get.helm.sh/helm-{{ helm_version }}-linux-amd64.tar.gz"
 helm_bin_dir: /opt/bin
-helm_chart_sbr_url: "https://github.com/5G-VICTORI-project/vios-infra.git"
+helm_chart_url: "https://5g-victori-project.github.io/vios-helmcharts"
 
 kubernetes_ubuntu_version: 1.21.3-00
