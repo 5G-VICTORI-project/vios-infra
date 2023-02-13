@@ -39,3 +39,33 @@
     name: repository
     namespace: 5g-vios
     chart_ref: vios-charts/repository
+
+- name: Installing the ServiceComposer
+  kubernetes.core.helm:
+    name: servicecomposer
+    namespace: 5g-vios
+    chart_ref: vios-charts/servicecomposer
+
+- name: Installing the Profiler
+  kubernetes.core.helm:
+    name: profiler
+    namespace: 5g-vios
+    chart_ref: vios-charts/profiler
+
+- name: Installing Monitoring
+  kubernetes.core.helm:
+    name: monitoring
+    namespace: 5g-vios
+    chart_ref: vios-charts/monitoring
+
+- name: Installing the Portalfilestorage
+  kubernetes.core.helm:
+    name: portalfilestorage
+    namespace: 5g-vios
+    chart_ref: vios-charts/portalfilestorage
+
+- name: Installing the Portal
+  kubernetes.core.helm:
+    name: portal
+    namespace: 5g-vios
+    chart_ref: vios-charts/portal
