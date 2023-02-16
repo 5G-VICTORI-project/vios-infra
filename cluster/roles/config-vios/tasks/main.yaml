@@ -69,3 +69,9 @@
     name: portal
     namespace: 5g-vios
     chart_ref: vios-charts/portal
+
+- name: Installing the ConnectivityManager
+  kubernetes.core.helm:
+    name: connectivitymanager
+    namespace: 5g-vios
+    chart_ref: vios-charts/connectivitymanager
