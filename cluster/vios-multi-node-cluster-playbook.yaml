@@ -1,0 +1,16 @@
+---
+- name: Creating new master node vm
+  hosts: localhost
+  gather_facts: false
+  pre_tasks:
+    - name: Set variables
+      set_fact:
+        state: present
+  roles:
+    - create-master
+
+- name: Creating new worker node vms
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - create-worker

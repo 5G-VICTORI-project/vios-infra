@@ -1,0 +1,59 @@
+- name: Creating worker nodes
+  os_server:
+    name: "{{ workers_name }}{{ item }}"
+    image: "{{ workers_image }}"
+    key_name: "{{ cloud_key_name }}"
+    region_name: "{{ cloud_region }}"
+    availability_zone: "{{ cloud_availability_zone }}"
+    flavor: "{{ workers_flavor_name }}"
+    auto_ip: "{{ workers_auto_ip }}"
+    nics:
+      - net-name: "{{ cluster_network_name }}"
+    security_groups: "{{ cluster_security_group }}"
+  when: state == "present"
+  register: "instances"
+  with_sequence: count={{ workers_count }}
+
+- name: Updating inventory for private IPs
+  add_host:
+    name: "{{ item.server.name }}"
+    ansible_ssh_host: "{{ item.server.private_v4 }}"
+    ansible_ssh_user: "{{ cluster_ssh_user }}"
+    ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q ubuntu@{{ hostvars[groups.master[0]][''ansible_ssh_host''] }}"'
+    groupname: workers
+  with_items: "{{ instances.results }}"
+  when:
+    - state == "present"
+
+- name: Updating inventory with public IPs
+  add_host:
+    name: "{{ item.server.name }}"
+    ansible_ssh_host: "{{ item.server.public_v4 }}"
+    ansible_ssh_user: "{{ cluster_ssh_user }}"
+    groupname: workers
+  with_items: "{{ instances.results }}"
+  when:
+    - state == "present"
+
+- name: Waiting for workers to boot
+  wait_for:
+    host: "{{ hostvars[item]['ansible_ssh_host'] }}"
+    port: 22
+    search_regex: OpenSSH
+  with_items: "{{ groups.workers }}"
+  delegate_to: "{{ groups.master[0] }}"
+  when: state == "present"
+
+- name: Scan SSH host keys
+  command: "ssh-keyscan {{ hostvars[item]['ansible_ssh_host'] }}"
+  with_items: "{{ groups.workers }}"
+  register: ssh_host_keys
+  delegate_to: "{{ groups.master[0] }}"
+  when: state == "present"
+
+- name: Update SSH known_hosts
+  lineinfile:
+    name: ~/.ssh/known_hosts
+    line: "{{ item.stdout }}"
+  with_items: "{{ ssh_host_keys.results }}"
+  when: state == "present"

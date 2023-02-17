@@ -9,16 +9,21 @@ cloud_tenant_name: "{{ lookup('env','CLOUD_TENANT_NAME') }}"
 cloud_key_name: ansible
 
 master_name: "{{ app_name }}-master1"
-master_flavor_name: m2.medium
+master_flavor_name: m1.small
 master_image_name: ubuntu-20_04-image
 
+workers_count: 2
+workers_name: "{{ app_name }}-worker"
+workers_image: ubuntu-20_04-image
+workers_flavor_name: m1.small
+workers_auto_ip: false
+
 cluster_network_name: mgmt
-cluster_security_groups: default
+cluster_security_group: default
 cluster_subnet_name: mgmt
 cluster_subnet_cidr: 10.8.10.0/24
 cluster_pod_subnet_cidr: 10.244.0.0/16
 cluster_dns_ip: 10.96.0.10
-cluster_group: "{{ app_name }}_master"
 cluster_ssh_user: ubuntu
 
 docker_url_apt_key: "https://download.docker.com/linux/ubuntu/gpg"

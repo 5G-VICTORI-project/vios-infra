@@ -11,8 +11,9 @@
     image: "{{ master_image_name }}"
     key_name: "{{ cloud_key_name }}"
     flavor: "{{ master_flavor_name }}"
-    nics: [ { net-name: "{{ cluster_network_name }}" } ]
-    security_groups: "{{ cluster_security_groups }}"
+    nics:
+      - net-name: "{{ cluster_network_name }}"
+    security_groups: "{{ cluster_security_group }}"
   when: state == "present"
   register: instance
 
@@ -21,7 +22,7 @@
     name: "{{ instance.server.name }}"
     ansible_ssh_host: "{{ instance.openstack.public_v4 }}"
     ansible_ssh_user: "{{ cluster_ssh_user }}"
-    groupname: "{{ cluster_group }}"
+    groupname: master
   when: state == "present"
 
 - name: Waiting for master node to boot up
