@@ -10,7 +10,7 @@
     - create-master
 
 - name: Configuring master node
-  hosts: vios-master1
+  hosts: master
   gather_facts: false
   tags:
     - bootstrap
@@ -20,9 +20,10 @@
     - role: config-master
       vars:
         cluster_ip: "{{ hostvars['localhost']['instance']['openstack']['public_v4'] }}"
+    - taint-master
 
 - name: Installing vios microservices
-  hosts: vios-master1
+  hosts: master
   gather_facts: false
   environment:
     K8S_AUTH_KUBECONFIG: "~/.kube/config"

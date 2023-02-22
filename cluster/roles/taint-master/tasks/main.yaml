@@ -1,0 +1,4 @@
+- name: Tainting the kubernetes master node
+  become: yes
+  become_user: "{{ cluster_ssh_user }}"
+  command: kubectl taint nodes --all node-role.kubernetes.io/master-

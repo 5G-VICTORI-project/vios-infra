@@ -1,59 +1,85 @@
-- name: Creating worker nodes
+- name: Creating worker node 1
   os_server:
-    name: "{{ workers_name }}{{ item }}"
+    auth:
+      auth_url: "{{ cloud_auth_url }}"
+      username: "{{ cloud_username }}"
+      password: "{{ cloud_password }}"
+      project_name: "{{ cloud_tenant_name }}"
+    name: "{{ workers_name }}1"
     image: "{{ workers_image }}"
     key_name: "{{ cloud_key_name }}"
     region_name: "{{ cloud_region }}"
     availability_zone: "{{ cloud_availability_zone }}"
     flavor: "{{ workers_flavor_name }}"
-    auto_ip: "{{ workers_auto_ip }}"
     nics:
       - net-name: "{{ cluster_network_name }}"
     security_groups: "{{ cluster_security_group }}"
   when: state == "present"
-  register: "instances"
-  with_sequence: count={{ workers_count }}
+  register: instance1
 
-- name: Updating inventory for private IPs
+- name: Updating ansible inventory with worker node 1
   add_host:
-    name: "{{ item.server.name }}"
-    ansible_ssh_host: "{{ item.server.private_v4 }}"
-    ansible_ssh_user: "{{ cluster_ssh_user }}"
-    ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q ubuntu@{{ hostvars[groups.master[0]][''ansible_ssh_host''] }}"'
-    groupname: workers
-  with_items: "{{ instances.results }}"
-  when:
-    - state == "present"
-
-- name: Updating inventory with public IPs
-  add_host:
-    name: "{{ item.server.name }}"
-    ansible_ssh_host: "{{ item.server.public_v4 }}"
+    name: "{{ instance1.server.name }}"
+    ansible_ssh_host: "{{ instance1.openstack.public_v4 }}"
     ansible_ssh_user: "{{ cluster_ssh_user }}"
     groupname: workers
-  with_items: "{{ instances.results }}"
-  when:
-    - state == "present"
+  when: state == "present"
 
-- name: Waiting for workers to boot
+- name: Waiting for worker node 1 to boot up
+  tags: bootstrap
   wait_for:
-    host: "{{ hostvars[item]['ansible_ssh_host'] }}"
+    host: "{{ instance1.openstack.public_v4 }}"
     port: 22
     search_regex: OpenSSH
-  with_items: "{{ groups.workers }}"
-  delegate_to: "{{ groups.master[0] }}"
   when: state == "present"
 
-- name: Scan SSH host keys
-  command: "ssh-keyscan {{ hostvars[item]['ansible_ssh_host'] }}"
-  with_items: "{{ groups.workers }}"
-  register: ssh_host_keys
-  delegate_to: "{{ groups.master[0] }}"
-  when: state == "present"
-
-- name: Update SSH known_hosts
+- name: Adding SSH keys to access worker node 1
   lineinfile:
-    name: ~/.ssh/known_hosts
-    line: "{{ item.stdout }}"
-  with_items: "{{ ssh_host_keys.results }}"
+    dest: ~/.ssh/known_hosts
+    create: yes
+    state: present
+    line: "{{ lookup('pipe', 'ssh-keyscan ' + instance1.openstack.public_v4 ) }}"
+  when: state == "present"
+
+- name: Creating worker node 2
+  os_server:
+    auth:
+      auth_url: "{{ cloud_auth_url }}"
+      username: "{{ cloud_username }}"
+      password: "{{ cloud_password }}"
+      project_name: "{{ cloud_tenant_name }}"
+    name: "{{ workers_name }}2"
+    image: "{{ workers_image }}"
+    key_name: "{{ cloud_key_name }}"
+    region_name: "{{ cloud_region }}"
+    availability_zone: "{{ cloud_availability_zone }}"
+    flavor: "{{ workers_flavor_name }}"
+    nics:
+      - net-name: "{{ cluster_network_name }}"
+    security_groups: "{{ cluster_security_group }}"
+  when: state == "present"
+  register: instance2
+
+- name: Updating ansible inventory with worker node 2
+  add_host:
+    name: "{{ instance2.server.name }}"
+    ansible_ssh_host: "{{ instance2.openstack.public_v4 }}"
+    ansible_ssh_user: "{{ cluster_ssh_user }}"
+    groupname: workers
+  when: state == "present"
+
+- name: Waiting for worker node 2 to boot up
+  tags: bootstrap
+  wait_for:
+    host: "{{ instance2.openstack.public_v4 }}"
+    port: 22
+    search_regex: OpenSSH
+  when: state == "present"
+
+- name: Adding SSH keys to access worker node 2
+  lineinfile:
+    dest: ~/.ssh/known_hosts
+    create: yes
+    state: present
+    line: "{{ lookup('pipe', 'ssh-keyscan ' + instance2.openstack.public_v4 ) }}"
   when: state == "present"

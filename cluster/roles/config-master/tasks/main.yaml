@@ -57,10 +57,15 @@
     chdir: $HOME
     creates: pod_setup.txt
 
-- name: Getting kubernetes worker node token
+- name: Generating a kubernetes worker node join token
   become: yes
   become_user: "{{ cluster_ssh_user }}"
-  shell: kubeadm token create --print-join-command >> node_join_token.txt
+  command: kubeadm token create --print-join-command
+  register: joincommand
+
+- name: Set fact joincommand
+  set_fact:
+    joincommand: "{{ joincommand.stdout }}"
 
 - name: Copying default kubernetes storage class configuration file
   become: yes
@@ -97,11 +102,6 @@
   become: yes
   become_user: "{{ cluster_ssh_user }}"
   command: kubectl apply -f "/home/{{ cluster_ssh_user }}/rbac.yaml"
-
-- name: Tainting the kubernetes master node
-  become: yes
-  become_user: "{{ cluster_ssh_user }}"
-  command: kubectl taint nodes --all node-role.kubernetes.io/master-
 
 - name: Installing kubernetes dashboard
   become: yes

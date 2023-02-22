@@ -8,15 +8,15 @@ cloud_auth_url: "{{ lookup('env','CLOUD_AUTH_URL') }}"
 cloud_tenant_name: "{{ lookup('env','CLOUD_TENANT_NAME') }}"
 cloud_key_name: ansible
 
-master_name: "{{ app_name }}-master1"
-master_flavor_name: m1.small
+master_name: "{{ app_name }}-master"
+master_flavor_name: m2.medium
 master_image_name: ubuntu-20_04-image
 
 workers_count: 2
 workers_name: "{{ app_name }}-worker"
 workers_image: ubuntu-20_04-image
 workers_flavor_name: m1.small
-workers_auto_ip: false
+workers_auto_ip: False
 
 cluster_network_name: mgmt
 cluster_security_group: default

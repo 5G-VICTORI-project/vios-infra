@@ -14,3 +14,23 @@
   gather_facts: false
   roles:
     - create-worker
+
+- name: Preparing nodes
+  hosts: "master, workers"
+  gather_facts: false
+  become: true
+  tags:
+    - bootstrap
+  roles:
+    - config-common
+
+- name: Configuring master node
+  hosts: master
+  gather_facts: false
+  tags:
+    - bootstrap
+  become: true
+  roles:
+    - role: config-master
+      vars:
+        cluster_ip: "{{ hostvars['localhost']['instance']['openstack']['public_v4'] }}"
