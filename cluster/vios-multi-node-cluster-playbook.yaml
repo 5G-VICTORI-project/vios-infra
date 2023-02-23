@@ -1,5 +1,5 @@
 ---
-- name: Creating new master node vm
+- name: Create master node
   hosts: localhost
   gather_facts: false
   pre_tasks:
@@ -9,13 +9,13 @@
   roles:
     - create-master
 
-- name: Creating new worker node vms
+- name: Create worker nodes
   hosts: localhost
   gather_facts: false
   roles:
     - create-worker
 
-- name: Preparing nodes
+- name: Prepare all nodes
   hosts: "master, workers"
   gather_facts: false
   become: true
@@ -24,7 +24,7 @@
   roles:
     - config-common
 
-- name: Configuring master node
+- name: Configure master node
   hosts: master
   gather_facts: false
   tags:
@@ -32,5 +32,16 @@
   become: true
   roles:
     - role: config-master
+      vars:
+        cluster_ip: "{{ hostvars['localhost']['instance']['openstack']['public_v4'] }}"
+
+- name: Configure worker nodes
+  hosts: workers
+  gather_facts: false
+  tags:
+    - bootstrap
+  become: true
+  roles:
+    - role: config-worker
       vars:
         cluster_ip: "{{ hostvars['localhost']['instance']['openstack']['public_v4'] }}"

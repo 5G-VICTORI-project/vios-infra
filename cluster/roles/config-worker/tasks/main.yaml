@@ -1,3 +1,16 @@
+- name: Installing nfs common
+  shell: |
+    sudo apt-get update
+    sudo apt-get install -y nfs-common
+    sudo apt-mark hold nfs-common
+
+- name: Mounting nfs volume
+  mount:
+    path: /mnt
+    src: "{{ cluster_ip }}:/nfs"
+    fstype: nfs
+    state: mounted
+
 - name: Checking for existing kubelet configuration
   stat:
     path: /etc/kubernetes/kubelet.conf
