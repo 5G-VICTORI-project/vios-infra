@@ -12,11 +12,15 @@ master_name: "{{ app_name }}-master"
 master_flavor_name: m2.medium
 master_image_name: ubuntu-20_04-image
 
-workers_count: 2
 workers_name: "{{ app_name }}-worker"
 workers_image: ubuntu-20_04-image
 workers_flavor_name: m1.small
 workers_auto_ip: False
+
+vyos_name: "{{ app_name }}-vyoshub"
+vyos_image: ubuntu-20_04-image
+vyos_flavor_name: m1.small
+vyos_container_image: vyos/image:1.4-rolling
 
 cluster_network_name: mgmt
 cluster_security_group: default

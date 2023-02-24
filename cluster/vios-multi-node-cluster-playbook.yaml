@@ -15,7 +15,7 @@
   roles:
     - create-worker
 
-- name: Prepare all nodes
+- name: Prepare master and worker nodes
   hosts: "master, workers"
   gather_facts: false
   become: true
@@ -45,3 +45,11 @@
     - role: config-worker
       vars:
         cluster_ip: "{{ hostvars['localhost']['instance']['openstack']['public_v4'] }}"
+
+- name: Install vios microservices
+  hosts: master
+  gather_facts: false
+  environment:
+    K8S_AUTH_KUBECONFIG: "~/.kube/config"
+  roles:
+    - config-vios

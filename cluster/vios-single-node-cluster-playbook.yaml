@@ -1,5 +1,5 @@
 ---
-- name: Creating new master node vm
+- name: Create master node
   hosts: localhost
   gather_facts: false
   pre_tasks:
@@ -9,7 +9,7 @@
   roles:
     - create-master
 
-- name: Configuring master node
+- name: Configure master node
   hosts: master
   gather_facts: false
   tags:
@@ -22,7 +22,7 @@
         cluster_ip: "{{ hostvars['localhost']['instance']['openstack']['public_v4'] }}"
     - taint-master
 
-- name: Installing vios microservices
+- name: Install vios microservices
   hosts: master
   gather_facts: false
   environment:

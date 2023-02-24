@@ -1,0 +1,17 @@
+---
+- name: Create vyos hub node
+  hosts: localhost
+  gather_facts: false
+  pre_tasks:
+    - name: Set variables
+      set_fact:
+        state: present
+  roles:
+    - create-vyoshub
+
+- name: Config vyos hub node
+  hosts: vyos
+  gather_facts: false
+  become: true
+  roles:
+    - config-vyoshub

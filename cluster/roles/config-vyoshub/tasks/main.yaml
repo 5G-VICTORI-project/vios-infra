@@ -1,0 +1,71 @@
+- name: Adding ssh user to sudoers
+  lineinfile:
+    dest: /etc/sudoers
+    line: '{{ cluster_ssh_user }} ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: Installing common support packages
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - lsb-release
+      - gnupg
+      - python3-pip
+    state: latest
+    update_cache: true
+
+- name: Adding docker GPG key
+  apt_key:
+    url: "{{ docker_url_apt_key }}"
+    state: present
+
+- name: Adding docker repository to apt
+  apt_repository:
+    repo: "{{ docker_repository }}"
+    state: present
+
+- name: Installing docker
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  loop:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+
+- name: Checking docker is active
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Checking group "docker" exists
+  ansible.builtin.group:
+    name: docker
+    state: present
+
+- name: Adding ssh user to docker group
+  user:
+    name: "{{ cluster_ssh_user }}"
+    groups: docker
+    append: yes
+
+- name: Pulling vyos docker image
+  docker_image:
+    name: "{{ vyos_container_image }}"
+    source: pull
+
+- name: Starting vyos docker container
+  docker_container:
+    name: vyos
+    state: present
+    image: "{{ vyos_container_image }}"
+    detach: true
+    network_mode: host
+    privileged: true
+    volumes:
+      - /lib/modules:/lib/modules
+      - /config:/opt/vyatta/etc/config
+    entrypoint: /sbin/init
