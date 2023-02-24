@@ -60,7 +60,6 @@
 - name: Starting vyos docker container
   docker_container:
     name: vyos
-    state: present
     image: "{{ vyos_container_image }}"
     detach: true
     network_mode: host
