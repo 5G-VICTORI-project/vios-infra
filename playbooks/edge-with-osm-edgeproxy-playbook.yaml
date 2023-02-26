@@ -1,0 +1,27 @@
+---
+- name: Create edge node
+  hosts: localhost
+  gather_facts: false
+  pre_tasks:
+    - name: Set variables
+      set_fact:
+        state: present
+  roles:
+    - create-edge
+
+- name: Configure edge node
+  hosts: edges
+  gather_facts: false
+  tags:
+    - bootstrap
+  become: true
+  roles:
+    - config-edge
+
+#- name: Install edgeproxy
+#  hosts: edges
+#  gather_facts: false
+#  environment:
+#    K8S_AUTH_KUBECONFIG: "~/.kube/config"
+#  roles:
+#    - config-edgeproxy

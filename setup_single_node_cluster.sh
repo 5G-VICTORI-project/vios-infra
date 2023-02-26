@@ -1,4 +1,4 @@
 #!/bin/bash
 source ~/.secrets/openstack
-cd cluster
+cd playbooks
 ansible-playbook vios-single-node-cluster-playbook.yaml

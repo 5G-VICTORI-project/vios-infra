@@ -1,4 +1,6 @@
 app_name: vios
+app_node_image: ubuntu-20_04-image
+app_network: mgmt
 
 cloud_username: "{{ lookup('env','CLOUD_USERNAME') }}"
 cloud_password: "{{ lookup('env','CLOUD_PASSWORD') }}"
@@ -10,21 +12,27 @@ cloud_key_name: ansible
 
 master_name: "{{ app_name }}-master"
 master_flavor_name: m2.medium
-master_image_name: ubuntu-20_04-image
+master_image_name: "{{ app_node_image }}"
 
 workers_name: "{{ app_name }}-worker"
-workers_image: ubuntu-20_04-image
+workers_image: "{{ app_node_image }}"
 workers_flavor_name: m1.small
 workers_auto_ip: False
 
-vyos_name: "{{ app_name }}-vyoshub"
-vyos_image: ubuntu-20_04-image
+vyos_hub_name: "{{ app_name }}-vyos-hub"
+vyos_spoke_name: "{{ app_name }}-vyos-spoke"
+vyos_image: "{{ app_node_image }}"
 vyos_flavor_name: m1.small
 vyos_container_image: vyos/image:1.4-rolling
 
-cluster_network_name: mgmt
+edge_name: "bdbf" # specify a name for the edge
+edge_node_name: "{{ app_name }}-{{ edge_name }}-edge"
+edge_image: "{{ app_node_image }}"
+edge_flavor_name: m1.medium
+
+cluster_network_name: "{{ app_network }}"
 cluster_security_group: default
-cluster_subnet_name: mgmt
+cluster_subnet_name: "{{ app_network }}"
 cluster_subnet_cidr: 10.8.10.0/24
 cluster_pod_subnet_cidr: 10.244.0.0/16
 cluster_dns_ip: 10.96.0.10

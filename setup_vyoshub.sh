@@ -1,4 +1,4 @@
 #!/bin/bash
 source ~/.secrets/openstack
-cd cluster
+cd playbooks
 ansible-playbook vyos-hub-playbook.yaml

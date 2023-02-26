@@ -1,42 +1,42 @@
-- name: Creating vyos hub node
+- name: Creating edge node
   os_server:
     auth:
       auth_url: "{{ cloud_auth_url }}"
       username: "{{ cloud_username }}"
       password: "{{ cloud_password }}"
       project_name: "{{ cloud_tenant_name }}"
-    name: "{{ vyos_name }}"
+    name: "{{ edge_node_name }}"
     region_name: "{{ cloud_region }}"
     availability_zone: "{{ cloud_availability_zone }}"
-    image: "{{ vyos_image }}"
+    image: "{{ edge_image }}"
     key_name: "{{ cloud_key_name }}"
-    flavor: "{{ vyos_flavor_name }}"
+    flavor: "{{ edge_flavor_name }}"
     nics:
       - net-name: "{{ cluster_network_name }}"
     security_groups: "{{ cluster_security_group }}"
   when: state == "present"
-  register: vyos_instance
+  register: edge_instance
 
-- name: Updating ansible inventory with vyos hub node
+- name: Updating ansible inventory with edge node
   add_host:
-    name: "{{ vyos_instance.server.name }}"
-    ansible_ssh_host: "{{ vyos_instance.openstack.public_v4 }}"
+    name: "{{ edge_instance.server.name }}"
+    ansible_ssh_host: "{{ edge_instance.openstack.public_v4 }}"
     ansible_ssh_user: "{{ cluster_ssh_user }}"
-    groupname: vyos
+    groupname: edges
   when: state == "present"
 
-- name: Waiting for vyos hub node to boot up
+- name: Waiting for edge node to boot up
   tags: bootstrap
   wait_for:
-    host: "{{ vyos_instance.openstack.public_v4 }}"
+    host: "{{ edge_instance.openstack.public_v4 }}"
     port: 22
     search_regex: OpenSSH
   when: state == "present"
 
-- name: Adding SSH keys to access vyos hub node
+- name: Adding SSH keys to access edge node
   lineinfile:
     dest: ~/.ssh/known_hosts
     create: yes
     state: present
-    line: "{{ lookup('pipe', 'ssh-keyscan ' + vyos_instance.openstack.public_v4 ) }}"
+    line: "{{ lookup('pipe', 'ssh-keyscan ' + edge_instance.openstack.public_v4 ) }}"
   when: state == "present"
