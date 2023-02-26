@@ -28,7 +28,7 @@ vyos_container_image: vyos/image:1.4-rolling
 edge_name: "bdbf" # specify a name for the edge
 edge_node_name: "{{ app_name }}-{{ edge_name }}-edge"
 edge_image: "{{ app_node_image }}"
-edge_flavor_name: m1.medium
+edge_flavor_name: m2.medium
 
 cluster_network_name: "{{ app_network }}"
 cluster_security_group: default
