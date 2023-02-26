@@ -18,10 +18,10 @@
   roles:
     - config-edge
 
-#- name: Install edgeproxy
-#  hosts: edges
-#  gather_facts: false
-#  environment:
-#    K8S_AUTH_KUBECONFIG: "~/.kube/config"
-#  roles:
-#    - config-edgeproxy
+- name: Install EdgeProxy
+  hosts: edges
+  gather_facts: false
+  environment:
+    K8S_AUTH_KUBECONFIG: "~/.kube/config"
+  roles:
+    - config-edgeproxy

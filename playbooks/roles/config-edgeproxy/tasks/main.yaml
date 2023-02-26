@@ -1,0 +1,17 @@
+- name: Creating a kubernetes namespace
+  kubernetes.core.k8s:
+    name: 5g-vios
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Adding helm charts repo
+  kubernetes.core.helm_repository:
+    name: vios-charts
+    repo_url: "{{ helm_chart_url }}"
+
+- name: Installing the EdgeProxy
+  kubernetes.core.helm:
+    name: edgeproxy
+    namespace: 5g-vios
+    chart_ref: vios-charts/edgeproxy

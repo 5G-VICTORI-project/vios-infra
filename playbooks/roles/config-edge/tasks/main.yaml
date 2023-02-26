@@ -8,17 +8,6 @@
     dest: ./install_osm.sh
     mode: a+x
 
-#- name: Running OSM install script
-#  become_user: "{{ cluster_ssh_user }}"
-#  expect:
-#    command: ./install_osm.sh -y 2>&1 & | tee osm_install_log.txt
-#    echo: true
-#    responses:
-#      (.*)Do you want to proceed(.*): "Y"
-#    timeout: null
-
 - name: Running OSM install script
   become_user: "{{ cluster_ssh_user }}"
   command: ./install_osm.sh -y 2>&1 & | tee osm_install_log.txt
-#  async: 180
-#  poll: 0
