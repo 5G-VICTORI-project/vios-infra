@@ -17,7 +17,6 @@ master_image_name: "{{ app_node_image }}"
 workers_name: "{{ app_name }}-worker"
 workers_image: "{{ app_node_image }}"
 workers_flavor_name: m1.small
-workers_auto_ip: False
 
 vyos_hub_name: "{{ app_name }}-vyos-hub"
 vyos_spoke_name: "{{ app_name }}-vyos-spoke"
@@ -29,6 +28,10 @@ edge_name: "bdbf" # specify a name for the edge
 edge_node_name: "{{ app_name }}-{{ edge_name }}-edge"
 edge_image: "{{ app_node_image }}"
 edge_flavor_name: m2.medium
+
+edge_proxy_name: "{{ app_name }}-{{ edge_name }}-edgeproxy"
+edge_proxy_image: "{{ app_node_image }}"
+edge_proxy_flavor_name: m1.small
 
 cluster_network_name: "{{ app_network }}"
 cluster_security_group: default
