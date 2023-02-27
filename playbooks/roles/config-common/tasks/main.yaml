@@ -74,7 +74,8 @@
 
 - name: Adding kubernetes GPG key
   apt_key:
-    url: "{{ k8s_url_apt_key }}"
+    url: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+#    url: "{{ k8s_url_apt_key }}"
     state: present
 
 - name: Adding kubernetes repository to apt
