@@ -17,6 +17,9 @@
   become: true
   roles:
     - config-common
+    - role: config-master
+      vars:
+        cluster_ip: "{{ hostvars['localhost']['instance']['openstack']['public_v4'] }}"
     - taint-master
 
 - name: Install EdgeProxy

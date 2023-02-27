@@ -43,7 +43,8 @@ cluster_ssh_user: ubuntu
 
 docker_url_apt_key: "https://download.docker.com/linux/ubuntu/gpg"
 docker_repository: "deb https://download.docker.com/linux/ubuntu focal stable"
-k8s_url_apt_key: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+# k8s_url_apt_key: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+k8s_url_apt_key: "https://web.archive.org/web/20230223152417if_/https://packages.cloud.google.com/apt/doc/apt-key.gpg"
 k8s_repository: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
 
 helm_version: v3.11.0

@@ -15,12 +15,12 @@
       - net-name: "{{ cluster_network_name }}"
     security_groups: "{{ cluster_security_group }}"
   when: state == "present"
-  register: ep_instance
+  register: instance
 
 - name: Updating ansible inventory with edge proxy node
   add_host:
-    name: "{{ ep_instance.server.name }}"
-    ansible_ssh_host: "{{ ep_instance.openstack.public_v4 }}"
+    name: "{{ instance.server.name }}"
+    ansible_ssh_host: "{{ instance.openstack.public_v4 }}"
     ansible_ssh_user: "{{ cluster_ssh_user }}"
     groupname: edgeproxy
   when: state == "present"
@@ -28,7 +28,7 @@
 - name: Waiting for edge proxy node to boot up
   tags: bootstrap
   wait_for:
-    host: "{{ ep_instance.openstack.public_v4 }}"
+    host: "{{ instance.openstack.public_v4 }}"
     port: 22
     search_regex: OpenSSH
   when: state == "present"
@@ -38,5 +38,5 @@
     dest: ~/.ssh/known_hosts
     create: yes
     state: present
-    line: "{{ lookup('pipe', 'ssh-keyscan ' + ep_instance.openstack.public_v4 ) }}"
+    line: "{{ lookup('pipe', 'ssh-keyscan ' + instance.openstack.public_v4 ) }}"
   when: state == "present"
