@@ -19,13 +19,21 @@
     - config-common
     - role: config-master
       vars:
-        cluster_ip: "{{ hostvars['localhost']['instance']['openstack']['public_v4'] }}"
+        cluster_ip: "{{ hostvars[inventory_hostname].ansible_ssh_host }}"
     - taint-master
 
 - name: Install EdgeProxy
   hosts: edgeproxy
   gather_facts: false
+  pre_tasks:
+    - name: Set variables
+      set_fact:
+        state: false
   environment:
     K8S_AUTH_KUBECONFIG: "~/.kube/config"
   roles:
     - config-edgeproxy
+    - role: update-edgeproxy
+      vars:
+        osm_server: "{{ hostvars[inventory_hostname].ansible_ssh_host }}"
+        epa_server: "{{ hostvars[inventory_hostname].ansible_ssh_host }}"

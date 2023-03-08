@@ -12,16 +12,27 @@
 - name: Configure edge node
   hosts: edges
   gather_facts: false
-  tags:
-    - bootstrap
   become: true
   roles:
     - config-edge
+  tasks:
+    - set_fact:
+        vim_id: "{{ hostvars[inventory_hostname].vim.stdout }}"
+        host_id: "{{ hostvars[inventory_hostname].ansible_ssh_host }}"
 
 - name: Install EdgeProxy
   hosts: edges
   gather_facts: false
+  pre_tasks:
+    - name: Set variables
+      set_fact:
+        state: present
   environment:
     K8S_AUTH_KUBECONFIG: "~/.kube/config"
   roles:
     - config-edgeproxy
+    - role: update-edgeproxy
+      vars:
+        vim_account: "{{ vim_id }}"
+        osm_server: "{{ host_id }}"
+        epa_server: "{{ host_id }}"

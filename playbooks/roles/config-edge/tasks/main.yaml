@@ -1,3 +1,25 @@
+- name: Adding ssh user to sudoers
+  lineinfile:
+    dest: /etc/sudoers
+    line: '{{ cluster_ssh_user }} ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: Installing support packages
+  apt:
+    update_cache: true
+    pkg:
+      - python3-dev
+      - libcurl4-openssl-dev
+      - libssl-dev
+      - python3-pip
+    state: latest
+
+- name: Installing pycurl python package
+  pip:
+    name:
+      - pycurl
+      - kubernetes
+
 - name: Downloading OSM install script
   get_url:
     url: https://osm-download.etsi.org/ftp/osm-13.0-thirteen/install_osm.sh
@@ -11,3 +33,8 @@
 - name: Running OSM install script
   become_user: "{{ cluster_ssh_user }}"
   command: ./install_osm.sh -y 2>&1 & | tee osm_install_log.txt
+
+- name: Setting up VIM
+  become_user: "{{ cluster_ssh_user }}"
+  shell: "osm vim-create --name {{ cloud_tenant_name }} --user {{ cloud_username }} --password {{ cloud_password }} --auth_url {{ cloud_auth_url }} --tenant {{ cloud_tenant_name }} --account_type openstack --config='{security_groups: {{ app_sec_group }}, keypair: {{ cloud_key_name }}}'"
+  register: vim

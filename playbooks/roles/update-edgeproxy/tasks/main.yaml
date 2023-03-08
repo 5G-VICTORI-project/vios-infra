@@ -1,0 +1,45 @@
+- name: Updating cloud server ip address
+  become_user: "{{ cluster_ssh_user }}"
+  shell: "kubectl get cm edgeproxy-config -n 5g-vios -o yaml | sed -e 's|OPENSTACK_SERVER: tbc|OPENSTACK_SERVER: {{ cloud_server }}|' | kubectl apply -f -"
+
+- name: Updating cloud username
+  become_user: "{{ cluster_ssh_user }}"
+  shell: "kubectl get cm edgeproxy-config -n 5g-vios -o yaml | sed -e 's|OPENSTACK_USER: tbc|OPENSTACK_USER: {{ cloud_username }}|' | kubectl apply -f -"
+
+- name: Updating cloud password
+  become_user: "{{ cluster_ssh_user }}"
+  shell: "kubectl get cm edgeproxy-config -n 5g-vios -o yaml | sed -e 's|OPENSTACK_PASSWORD: tbc|OPENSTACK_PASSWORD: {{ cloud_password }}|' | kubectl apply -f -"
+
+- name: Updating cloud project name
+  become_user: "{{ cluster_ssh_user }}"
+  shell: "kubectl get cm edgeproxy-config -n 5g-vios -o yaml | sed -e 's|OPENSTACK_PROJECT: tbc|OPENSTACK_PROJECT: {{ cloud_tenant_name }}|' | kubectl apply -f -"
+
+- name: Updating cloud network name
+  become_user: "{{ cluster_ssh_user }}"
+  shell: "kubectl get cm edgeproxy-config -n 5g-vios -o yaml | sed -e 's|OPENSTACK_MGMT_NETWORK: tbc|OPENSTACK_MGMT_NETWORK: {{ cluster_network_name }}|' | kubectl apply -f -"
+
+- name: Updating vyos spoke ip address
+  become_user: "{{ cluster_ssh_user }}"
+  shell: "kubectl get cm edgeproxy-config -n 5g-vios -o yaml | sed -e 's|VYOS_SERVER: tbc|VYOS_SERVER: {{ vyos_spoke_ip }}|' | kubectl apply -f -"
+  when: state == "present"
+
+- name: Updating vyos spoke instance name
+  become_user: "{{ cluster_ssh_user }}"
+  shell: "kubectl get cm edgeproxy-config -n 5g-vios -o yaml | sed -e 's|VYOS_INSTANCE_NAME: tbc|VYOS_INSTANCE_NAME: {{ vyos_spoke_name }}|' | kubectl apply -f -"
+
+- name: Updating vim account id
+  become_user: "{{ cluster_ssh_user }}"
+  shell: "kubectl get cm edgeproxy-config -n 5g-vios -o yaml | sed -e 's|VIM_ACCOUNT: tbc|VIM_ACCOUNT: {{ vim_account }}|' | kubectl apply -f -"
+  when: state == "present"
+
+- name: Updating osm server ip address
+  become_user: "{{ cluster_ssh_user }}"
+  shell: "kubectl get cm edgeproxy-config -n 5g-vios -o yaml | sed -e 's|OSM_SERVER: tbc|OSM_SERVER: {{ osm_server }}|' | kubectl apply -f -"
+
+- name: Updating epa server ip address
+  become_user: "{{ cluster_ssh_user }}"
+  shell: "kubectl get cm edgeproxy-config -n 5g-vios -o yaml | sed -e 's|EPA_Server_IP: tbc|EPA_Server_IP: {{ epa_server }}|' | kubectl apply -f -"
+
+- name: Updating apigateway ip address
+  become_user: "{{ cluster_ssh_user }}"
+  shell: "kubectl get cm edgeproxy-config -n 5g-vios -o yaml | sed -e 's|APIGATEWAY_HOST: tbc|APIGATEWAY_HOST: {{ apigateway_ip }}|' | kubectl apply -f -"

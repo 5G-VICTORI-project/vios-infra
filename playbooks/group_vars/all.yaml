@@ -1,37 +1,44 @@
 app_node_image: ubuntu-20_04-image # specify the image to use
-app_node_base_flavor_name: m1.small # specify the flavor for support nodes
+app_node_base_flavor_name: m1.small # specify the flavour to use for support nodes
+app_node_key_flavor_name: m2.medium # specify the flavour to use for master nodes
 app_remote_user: ubuntu # specify the ssh user
 app_network: mgmt # specify the network to use
 app_sec_group: default # specify the security group to use
-edge_name: "bdbf" # specify a name for the edge to setup
+cloud_key: ansible # specify the key_name to use to access cloud apis
+edge_name: bdbf1 # specify a name for the edge
 helm_version: v3.11.0 # specify the helm version to use
+vyos_spoke: "" # specify the ip address of the vyos spoke vm for the given edge, if applicable
+apigateway: 10.100.19.56 # specify the ip address of the apigateway vm, if applicable
 
-# Do not change the variables below, these are set for the playbooks
+# Do not change the variables below, these are set for the roles
 app_name: vios
+cloud_server: "{{ lookup('env','CLOUD_SERVER') }}"
 cloud_username: "{{ lookup('env','CLOUD_USERNAME') }}"
 cloud_password: "{{ lookup('env','CLOUD_PASSWORD') }}"
 cloud_region: RegionOne
 cloud_availability_zone: nova
 cloud_auth_url: "{{ lookup('env','CLOUD_AUTH_URL') }}"
 cloud_tenant_name: "{{ lookup('env','CLOUD_TENANT_NAME') }}"
-cloud_key_name: ansible
+cloud_key_name: "{{ cloud_key }}"
 master_name: "{{ app_name }}-master"
-master_flavor_name: m2.medium
+master_flavor_name: "{{ app_node_key_flavor_name }}"
 master_image_name: "{{ app_node_image }}"
 workers_name: "{{ app_name }}-worker"
 workers_image: "{{ app_node_image }}"
 workers_flavor_name: "{{ app_node_base_flavor_name }}"
-vyos_hub_name: "{{ app_name }}-vyos-hub"
-vyos_spoke_name: "{{ app_name }}-vyos-spoke"
+vyos_hub_name: "{{ app_name }}-vyoshub"
+vyos_spoke_name: "{{ app_name }}-vyosspoke-{{ edge_name }}"
+vyos_spoke_ip: "{{ vyos_spoke }}"
 vyos_image: "{{ app_node_image }}"
 vyos_flavor_name: "{{ app_node_base_flavor_name }}"
 vyos_container_image: vyos/image:1.4-rolling
-edge_node_name: "{{ app_name }}-{{ edge_name }}-edge"
+edge_node_name: "{{ app_name }}-edge-{{ edge_name }}"
 edge_image: "{{ app_node_image }}"
-edge_flavor_name: m2.medium
-edge_proxy_name: "{{ app_name }}-{{ edge_name }}-edgeproxy"
+edge_flavor_name: "{{ app_node_key_flavor_name }}"
+edge_proxy_name: "{{ app_name }}-edgeproxy-{{ edge_name }}"
 edge_proxy_image: "{{ app_node_image }}"
 edge_proxy_flavor_name: "{{ app_node_base_flavor_name }}"
+apigateway_ip: "{{ apigateway }}"
 cluster_network_name: "{{ app_network }}"
 cluster_security_group: "{{ app_sec_group }}"
 cluster_subnet_name: "{{ app_network }}"

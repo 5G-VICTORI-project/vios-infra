@@ -1,4 +1,4 @@
 #!/bin/bash
-source ~/.secrets/openstack
+source ~/.secrets/ansible
 cd playbooks
 ansible-playbook edge-with-osm-edgeproxy-playbook.yaml
