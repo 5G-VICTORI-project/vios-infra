@@ -1,0 +1,3 @@
+- name: Updating vyos hub ip address
+  become_user: "{{ cluster_ssh_user }}"
+  shell: "kubectl get cm connectivitymanager-config -n 5g-vios -o yaml | sed -e 's|VYOS_SERVER: tbc|VYOS_SERVER: {{ vyos_server }}|' | kubectl apply -f -"

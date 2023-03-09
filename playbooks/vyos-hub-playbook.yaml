@@ -9,9 +9,29 @@
   roles:
     - create-vyoshub
 
+- name: Get related host inventory
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - get-inventory
+
 - name: Config vyos hub node
   hosts: vyos
   gather_facts: false
   become: true
   roles:
     - config-vyos-common
+
+- name: Update ConnectivityManager
+  hosts: master
+  gather_facts: false
+  pre_tasks:
+    - name: Set host id
+      set_fact:
+        host_id: "{{ hostvars['vios-vyoshub'].ansible_ssh_host }}"
+  environment:
+    K8S_AUTH_KUBECONFIG: "~/.kube/config"
+  roles:
+    - role: update-icm
+      vars:
+        vyos_server: "{{ host_id }}"

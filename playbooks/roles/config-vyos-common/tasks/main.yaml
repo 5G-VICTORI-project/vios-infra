@@ -69,16 +69,16 @@
       - /config:/opt/vyatta/etc/config
     entrypoint: /sbin/init
 
-- name: Enabling HTTPS API
-  community.docker.docker_container_exec:
-    container: vyos
-    user: vyos
-    tty: true
-    command: /bin/bash -c "{{ item }}"
-  register: result
-  with_items:
-    - configure
-    - set service https api keys id demo_id key demo_key
-    - set service https api debug
-    - set service https api port 8080
-    - save && commit
+#- name: Enabling HTTPS API
+#  community.docker.docker_container_exec:
+#    container: vyos
+#    user: vyos
+#    tty: true
+#    command: /bin/bash -c "{{ item }}"
+#  register: result
+#  with_items:
+#    - configure
+#    - set service https api keys id demo_id key demo_key
+#    - set service https api debug
+#    - set service https api port 8080
+#    - save && commit

@@ -1,0 +1,18 @@
+- name: Detecting master node
+  openstack.cloud.server_info:
+    auth:
+      auth_url: "{{ cloud_auth_url }}"
+      username: "{{ cloud_username }}"
+      password: "{{ cloud_password }}"
+      project_name: "{{ cloud_tenant_name }}"
+    server: vios-master
+    filters:
+      vm_state: active
+  register: vios_master
+
+- name: Updating ansible inventory with master node
+  add_host:
+    name: "{{ vios_master.openstack_servers[0].hostname }}"
+    ansible_ssh_host: "{{ vios_master.openstack_servers[0].public_v4 }}"
+    ansible_ssh_user: "{{ cluster_ssh_user }}"
+    groupname: master
