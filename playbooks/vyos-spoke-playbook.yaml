@@ -1,5 +1,5 @@
 ---
-- name: Create vyos hub node
+- name: Create vyos spoke node
   hosts: localhost
   gather_facts: false
   pre_tasks:
@@ -7,9 +7,9 @@
       set_fact:
         state: present
   roles:
-    - create-vyoshub
+    - create-vyosspoke
 
-- name: Config vyos hub node
+- name: Config vyos spoke node
   hosts: vyos
   gather_facts: false
   become: true

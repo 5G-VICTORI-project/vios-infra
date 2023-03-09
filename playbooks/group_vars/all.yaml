@@ -8,7 +8,7 @@ cloud_key: ansible # specify the key_name to use to access cloud apis
 edge_name: bdbf1 # specify a name for the edge
 helm_version: v3.11.0 # specify the helm version to use
 vyos_spoke: "" # specify the ip address of the vyos spoke vm for the given edge, if applicable
-apigateway: 10.100.19.56 # specify the ip address of the apigateway vm, if applicable
+apigateway: "" # specify the ip address of the apigateway vm, if applicable
 
 # Do not change the variables below, these are set for the roles
 app_name: vios
