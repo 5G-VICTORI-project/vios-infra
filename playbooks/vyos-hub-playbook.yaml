@@ -12,6 +12,11 @@
 - name: Get related host inventory
   hosts: localhost
   gather_facts: false
+  pre_tasks:
+    - name: Set variables
+      set_fact:
+        master: true
+        spoke: false
   roles:
     - get-inventory
 
@@ -28,10 +33,10 @@
   pre_tasks:
     - name: Set host id
       set_fact:
-        host_id: "{{ hostvars['vios-vyoshub'].ansible_ssh_host }}"
+        vyoshub_ip: "{{ hostvars['vios-vyoshub'].ansible_ssh_host }}"
   environment:
     K8S_AUTH_KUBECONFIG: "~/.kube/config"
   roles:
     - role: update-icm
       vars:
-        vyos_server: "{{ host_id }}"
+        vyos_server: "{{ vyoshub_ip }}"

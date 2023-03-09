@@ -21,7 +21,6 @@
 - name: Updating vyos spoke ip address
   become_user: "{{ cluster_ssh_user }}"
   shell: "kubectl get cm edgeproxy-config -n 5g-vios -o yaml | sed -e 's|VYOS_SERVER: tbc|VYOS_SERVER: {{ vyos_spoke_ip }}|' | kubectl apply -f -"
-  when: state == "present"
 
 - name: Updating vyos spoke instance name
   become_user: "{{ cluster_ssh_user }}"
@@ -35,6 +34,7 @@
 - name: Updating osm server ip address
   become_user: "{{ cluster_ssh_user }}"
   shell: "kubectl get cm edgeproxy-config -n 5g-vios -o yaml | sed -e 's|OSM_SERVER: tbc|OSM_SERVER: {{ osm_server }}|' | kubectl apply -f -"
+  when: state == "present"
 
 - name: Updating epa server ip address
   become_user: "{{ cluster_ssh_user }}"

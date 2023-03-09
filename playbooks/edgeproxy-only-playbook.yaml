@@ -9,6 +9,17 @@
   roles:
     - create-edgeproxy
 
+- name: Get related host inventory
+  hosts: localhost
+  gather_facts: false
+  pre_tasks:
+    - name: Set variables
+      set_fact:
+        master: present
+        spoke: present
+  roles:
+    - get-inventory
+
 - name: Configure edge proxy node
   hosts: edgeproxy
   gather_facts: false
@@ -19,7 +30,7 @@
     - config-common
     - role: config-master
       vars:
-        cluster_ip: "{{ hostvars[inventory_hostname].ansible_ssh_host }}"
+        cluster_ip: "{{ hostvars[groups['edgeproxy'][0]].ansible_ssh_host }}"
     - taint-master
 
 - name: Install EdgeProxy
@@ -35,5 +46,6 @@
     - config-edgeproxy
     - role: update-edgeproxy
       vars:
-        osm_server: "{{ hostvars[inventory_hostname].ansible_ssh_host }}"
-        epa_server: "{{ hostvars[inventory_hostname].ansible_ssh_host }}"
+        epa_server: "{{ hostvars[groups['edgeproxy'][0]].ansible_ssh_host }}"
+        apigateway_ip: "{{ hostvars[groups['master'][0]].ansible_ssh_host }}"
+        vyos_spoke_ip: "{{ hostvars[groups['spoke'][0]].ansible_ssh_host }}"
