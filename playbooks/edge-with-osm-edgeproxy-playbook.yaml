@@ -9,16 +9,23 @@
   roles:
     - create-edge
 
+- name: Get related host inventory
+  hosts: localhost
+  gather_facts: false
+  pre_tasks:
+    - name: Set variables
+      set_fact:
+        master: present
+        spoke: present
+  roles:
+    - get-inventory
+
 - name: Configure edge node
   hosts: edges
   gather_facts: false
   become: true
   roles:
     - config-edge
-  tasks:
-    - set_fact:
-        vim_id: "{{ hostvars[inventory_hostname].vim.stdout }}"
-        host_id: "{{ hostvars[inventory_hostname].ansible_ssh_host }}"
 
 - name: Install EdgeProxy
   hosts: edges
@@ -33,6 +40,8 @@
     - config-edgeproxy
     - role: update-edgeproxy
       vars:
-        vim_account: "{{ vim_id }}"
-        osm_server: "{{ host_id }}"
-        epa_server: "{{ host_id }}"
+        vim_account: "{{ hostvars[groups['edges'][0]].vim.stdout }}"
+        osm_server: "{{ hostvars[groups['edges'][0]].ansible_ssh_host }}"
+        epa_server: "{{ hostvars[groups['edges'][0]].ansible_ssh_host }}"
+        apigateway_ip: "{{ hostvars[groups['master'][0]].ansible_ssh_host }}"
+        vyos_spoke_ip: "{{ hostvars[groups['spoke'][0]].ansible_ssh_host }}"

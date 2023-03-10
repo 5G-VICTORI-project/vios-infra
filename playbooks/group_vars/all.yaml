@@ -1,20 +1,22 @@
 app_node_image: ubuntu-20_04-image # specify the image to use
 app_node_base_flavor_name: m1.small # specify the flavour to use for support nodes
 app_node_key_flavor_name: m2.medium # specify the flavour to use for master nodes
+app_node_region: RegionOne # specific the region to use
+app_node_az: nova # specify the availability zone to use
 app_remote_user: ubuntu # specify the ssh user
 app_network: mgmt # specify the network to use
 app_sec_group: default # specify the security group to use
 cloud_key: ansible # specify the key_name to use to access cloud apis
 edge_name: bdbf1 # specify a name for the edge
-helm_version: v3.11.0 # specify the helm version to use
+
 
 # Do not change the variables below, these are set for the roles
 app_name: vios
 cloud_server: "{{ lookup('env','CLOUD_SERVER') }}"
 cloud_username: "{{ lookup('env','CLOUD_USERNAME') }}"
 cloud_password: "{{ lookup('env','CLOUD_PASSWORD') }}"
-cloud_region: RegionOne
-cloud_availability_zone: nova
+cloud_region: "{{ app_node_region }}"
+cloud_availability_zone: "{{ app_node_az }}"
 cloud_auth_url: "{{ lookup('env','CLOUD_AUTH_URL') }}"
 cloud_tenant_name: "{{ lookup('env','CLOUD_TENANT_NAME') }}"
 cloud_key_name: "{{ cloud_key }}"
@@ -35,7 +37,6 @@ edge_flavor_name: "{{ app_node_key_flavor_name }}"
 edge_proxy_name: "{{ app_name }}-edgeproxy-{{ edge_name }}"
 edge_proxy_image: "{{ app_node_image }}"
 edge_proxy_flavor_name: "{{ app_node_base_flavor_name }}"
-# apigateway_ip: "{{ apigateway }}"
 cluster_network_name: "{{ app_network }}"
 cluster_security_group: "{{ app_sec_group }}"
 cluster_subnet_name: "{{ app_network }}"
@@ -48,6 +49,7 @@ docker_repository: "deb https://download.docker.com/linux/ubuntu focal stable"
 # k8s_url_apt_key: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
 k8s_url_apt_key: "https://web.archive.org/web/20230223152417if_/https://packages.cloud.google.com/apt/doc/apt-key.gpg"
 k8s_repository: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+helm_version: v3.11.0
 helm_url: "https://get.helm.sh/helm-{{ helm_version }}-linux-amd64.tar.gz"
 helm_bin_dir: /opt/bin
 helm_chart_url: "https://5g-victori-project.github.io/vios-helmcharts"

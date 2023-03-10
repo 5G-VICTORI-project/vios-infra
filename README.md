@@ -46,3 +46,46 @@ You will also need to create a key pair.  In Horizon, you can either create a ne
 ## Group Variables
 
 Global variables for all playbooks are set in a single file located in a file called [all.yaml](https://github.com/5G-VICTORI-project/vios-infra/blob/main/playbooks/group_vars/all.yaml).
+
+## Running the Playbooks
+
+The playbooks are designed to be run in a specific order to help with the automation.
+
+### 1. Apply Cloud Environment Variables
+
+Open a new terminal.
+
+Set up the environment variables for your Openstack environment by running the following command, replacing `((file))` with your `OpenStack RC` file, and enter the password when prompted:
+
+```console
+source ((file))
+```
+
+### 2. Build the 5G-VIOS Cluster
+
+At this stage, you can either build a three node production cluster, or a single node development cluster for `5G-VIOS`.
+
+Run the following command to build a production cluster:
+
+```console
+./setup_vios_multi_node_cluster.sh
+```
+
+Or, for a development cluster, run:
+
+```console
+./setup_vios_single_node_cluster.sh
+```
+
+### 3. Build the Vyos Hub Node
+
+Next, you will need to build the Vyos Hub node, which you can do by running the following command:
+
+```console
+./setup_vyos_hub.sh
+```
+
+### 4. Build the Vyos Spoke Node for your Edge
+
+
+### 5. Build your Edge or the EdgeProxy
