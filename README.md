@@ -87,5 +87,28 @@ Next, you will need to build the Vyos Hub node, which you can do by running the 
 
 ### 4. Build the Vyos Spoke Node for your Edge
 
+Before you can build your edge, you first need to setup the `Vyos Spoke` node for your edge.
+
+To do this, run the following command (making sure you have given your edge a name in the `all.yaml` file):
+
+```console
+./setup_vyos_spoke.sh
+```
 
 ### 5. Build your Edge or the EdgeProxy
+
+When building your edge, there are two choices. 
+
+You can  either build a fully integrated edge with `OSM` and the `EdgeProxy`, or if you already have `OSM` setup, you can build a separate `EdgeProxy` node.
+
+To build a fully integrated edge with `OSM` and the `EdgeProxy`, then run the following command:
+
+```console
+./setup_edge.sh
+```
+
+To build a separate EdgeProxy node, then run the following command:
+
+```console
+./setup_edgeproxy_only.sh
+```
