@@ -10,6 +10,8 @@ cloud_key: ansible
 cloud_net_provider: provider
 osm_version: 13
 edge_name: bdbf2
+edge_vlan_range_start: 0
+edge_vlan_range_end: 0
 
 
 # Do not change the variables below, these are set for the roles
@@ -41,6 +43,8 @@ edge_flavor_name: "{{ app_node_key_flavor_name }}"
 edge_proxy_name: "{{ app_name }}-edgeproxy-{{ edge_name }}"
 edge_proxy_image: "{{ app_node_image }}"
 edge_proxy_flavor_name: "{{ app_node_base_flavor_name }}"
+edge_vlan_pool_start: "{{ edge_vlan_range_start }}"
+edge_vlan_pool_end: "{{ edge_vlan_range_end }}"
 cluster_network_name: "{{ app_network }}"
 cluster_security_group: "{{ app_sec_group }}"
 cluster_subnet_name: "{{ app_network }}"

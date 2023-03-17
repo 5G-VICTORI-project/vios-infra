@@ -51,3 +51,11 @@
 - name: Updating apigateway ip address
   become_user: "{{ cluster_ssh_user }}"
   shell: "kubectl get cm edgeproxy-config -n 5g-vios -o yaml | sed -e 's|APIGATEWAY_HOST: tbc|APIGATEWAY_HOST: {{ apigateway_ip }}|' | kubectl apply -f -"
+
+- name: Updating edge vlan range start
+  become_user: "{{ cluster_ssh_user }}"
+  shell: "kubectl get cm edgeproxy-config -n 5g-vios -o yaml | sed -e 's|VLAN_START: tbc|VLAN_START: {{ edge_vlan_pool_start }}|' | kubectl apply -f -"
+
+- name: Updating edge vlan range end
+  become_user: "{{ cluster_ssh_user }}"
+  shell: "kubectl get cm edgeproxy-config -n 5g-vios -o yaml | sed -e 's|VLAN_END: tbc|VLAN_END: {{ edge_vlan_range_end }}|' | kubectl apply -f -"
