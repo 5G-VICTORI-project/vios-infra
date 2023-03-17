@@ -1,13 +1,15 @@
-app_node_image: ubuntu-20_04-image # specify the image to use
-app_node_base_flavor_name: m1.small # specify the flavour to use for support nodes
-app_node_key_flavor_name: m2.medium # specify the flavour to use for master nodes
-app_node_region: RegionOne # specific the region to use
-app_node_az: nova # specify the availability zone to use
-app_remote_user: ubuntu # specify the ssh user
-app_network: mgmt # specify the network to use
-app_sec_group: default # specify the security group to use
-cloud_key: ansible # specify the key_name to use to access cloud apis
-edge_name: bdbf1 # specify a name for the edge
+app_node_image: ubuntu-20_04-image
+app_node_base_flavor_name: m1.small
+app_node_key_flavor_name: m2.medium
+app_node_region: RegionOne
+app_node_az: nova
+app_remote_user: ubuntu
+app_network: mgmt
+app_sec_group: default
+cloud_key: ansible
+cloud_net_provider: provider
+osm_version: 13
+edge_name: bdbf2
 
 
 # Do not change the variables below, these are set for the roles
@@ -20,6 +22,8 @@ cloud_availability_zone: "{{ app_node_az }}"
 cloud_auth_url: "{{ lookup('env','CLOUD_AUTH_URL') }}"
 cloud_tenant_name: "{{ lookup('env','CLOUD_TENANT_NAME') }}"
 cloud_key_name: "{{ cloud_key }}"
+cloud_network_provider: "{{ cloud_net_provider }}"
+osm_server_version: "{{ osm_version }}"
 master_name: "{{ app_name }}-master"
 master_flavor_name: "{{ app_node_key_flavor_name }}"
 master_image_name: "{{ app_node_image }}"
