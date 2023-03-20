@@ -1,6 +1,6 @@
 # 5G-VIOS Installation Playbooks
 
-This repository contains the playbooks for automatically installing and configuring the different components of the `5G-VIOS` ecosystem.
+This repository contains the playbooks for automatically installing and configuring the different components of the `5G-VIOS` ecosystem within a cloud environment.
 
 ## Playbooks
 
@@ -46,6 +46,23 @@ You will also need to create a key pair.  In Horizon, you can either create a ne
 ## Group Variables
 
 Global variables for all playbooks are set in a single file located in a file called [all.yaml](https://github.com/5G-VICTORI-project/vios-infra/blob/main/playbooks/group_vars/all.yaml).
+
+| **Variable**                    | **Description**                                                |
+|:--------------------------------|:---------------------------------------------------------------|
+| **`app_node_image`**            | The base image to use to build your `5G-VIOS` nodes            |
+| **`app_node_base_flavor_name`** | The resources flavour to use for support nodes                 |
+| **`app_node_key_flavor_name`**  | The resources flavour to use for key `5G-VIOS`nodes            |
+| **`app_node_region`**           | The cloud region to use for `5G-VIOS` nodes                    |
+| **`app_node_az`**               | The cloud availability zone to use for `5G-VIOS` nodes         |
+| **`app_remote_user`**           | The remote ssh user to use                                     |
+| **`app_network`**               | The cloud network to attach your `5G-VIOS` nodes to            |
+| **`app_sec_group`**             | The cloud security group to attach your `5G-VIOS`nodes to      |
+| **`cloud_key`**                 | The cloud api key to use for secure access                     |
+| **`cloud_net_provider`**        | The cloud network provider name                                |
+| **`osm_version`**               | The version of `OSM` you are using                             |
+| **`edge_name`**                 | The name to be given as an identifier for an edge              |
+| **`edge_vlan_range_start`**     | The starting vlan pool range for your edge, default set to `0` |
+| **`edge_vlan_range_end`**       | The ending vlan pool range for your edge, default set to `0`   |  
 
 ## Running the Playbooks
 
