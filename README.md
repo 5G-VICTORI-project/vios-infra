@@ -45,20 +45,20 @@ You will also need to create a key pair.  In Horizon, you can either create a ne
 
 ## Group Variables
 
-Global variables for all playbooks are set in a single file located in a file called [all.yaml](https://github.com/5G-VICTORI-project/vios-infra/blob/main/playbooks/group_vars/all.yaml).
+Global variables for all playbooks are set in a single place located in a file called [all.yaml](https://github.com/5G-VICTORI-project/vios-infra/blob/main/playbooks/group_vars/all.yaml).
 
 | **Variable**                    | **Description**                                                |
 |:--------------------------------|:---------------------------------------------------------------|
 | **`app_node_image`**            | The base image to use to build your `5G-VIOS` nodes            |
 | **`app_node_base_flavor_name`** | The resources flavour to use for support nodes                 |
-| **`app_node_key_flavor_name`**  | The resources flavour to use for key `5G-VIOS`nodes            |
+| **`app_node_key_flavor_name`**  | The resources flavour to use for key `5G-VIOS` nodes           |
 | **`app_node_region`**           | The cloud region to use for `5G-VIOS` nodes                    |
 | **`app_node_az`**               | The cloud availability zone to use for `5G-VIOS` nodes         |
-| **`app_remote_user`**           | The remote ssh user to use                                     |
+| **`app_remote_user`**           | The remote ssh user to use to access your `5G-VIOS` nodes      |
 | **`app_network`**               | The cloud network to attach your `5G-VIOS` nodes to            |
 | **`app_sec_group`**             | The cloud security group to attach your `5G-VIOS`nodes to      |
 | **`cloud_key`**                 | The cloud api key to use for secure access                     |
-| **`cloud_net_provider`**        | The cloud network provider name                                |
+| **`cloud_net_provider`**        | The cloud network provider name, default set to `provider`     |
 | **`osm_version`**               | The version of `OSM` you are using                             |
 | **`edge_name`**                 | The name to be given as an identifier for an edge              |
 | **`edge_vlan_range_start`**     | The starting vlan pool range for your edge, default set to `0` |
@@ -104,7 +104,7 @@ Next, you will need to build the Vyos Hub node, which you can do by running the 
 
 ### 4. Build the Vyos Spoke Node for your Edge
 
-Before you can build your edge, you first need to setup the `Vyos Spoke` node for your edge.
+Before you can build your edge, you first need to set up the `Vyos Spoke` node for your edge.
 
 To do this, run the following command (making sure you have given your edge a name in the `all.yaml` file):
 
@@ -116,15 +116,15 @@ To do this, run the following command (making sure you have given your edge a na
 
 When building your edge, there are two choices. 
 
-You can  either build a fully integrated edge with `OSM` and the `EdgeProxy`, or if you already have `OSM` setup, you can build a separate `EdgeProxy` node.
+You can either build a fully integrated edge with `OSM` and the `EdgeProxy`, or if you already have `OSM` set up, you can build a separate `EdgeProxy` node.
 
-To build a fully integrated edge with `OSM` and the `EdgeProxy`, then run the following command:
+To build a fully integrated edge with `OSM` and the `EdgeProxy`, run the following command:
 
 ```console
 ./setup_edge.sh
 ```
 
-To build a separate EdgeProxy node, then run the following command:
+Or, to build a separate EdgeProxy node, run the following command:
 
 ```console
 ./setup_edgeproxy_only.sh
