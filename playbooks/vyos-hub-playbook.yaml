@@ -5,7 +5,7 @@
   pre_tasks:
     - name: Set variables
       set_fact:
-        state: present
+        state: false
   roles:
     - create-vyoshub
 
@@ -15,7 +15,7 @@
   pre_tasks:
     - name: Set variables
       set_fact:
-        master: true
+        master: present
         spoke: false
   roles:
     - get-inventory
@@ -24,6 +24,10 @@
   hosts: vyos
   gather_facts: false
   become: true
+  pre_tasks:
+    - name: Set variables
+      set_fact:
+        state: false
   roles:
     - config-vyos-common
 

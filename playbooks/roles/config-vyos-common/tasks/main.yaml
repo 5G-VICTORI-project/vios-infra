@@ -3,6 +3,7 @@
     dest: /etc/sudoers
     line: '{{ cluster_ssh_user }} ALL=(ALL) NOPASSWD: ALL'
     validate: 'visudo -cf %s'
+  when: state == "present"
 
 - name: Installing common support packages
   apt:
@@ -14,16 +15,19 @@
       - python3-pip
     state: latest
     update_cache: true
+  when: state == "present"
 
 - name: Adding docker GPG key
   apt_key:
     url: "{{ docker_url_apt_key }}"
     state: present
+  when: state == "present"
 
 - name: Adding docker repository to apt
   apt_repository:
     repo: "{{ docker_repository }}"
     state: present
+  when: state == "present"
 
 - name: Installing docker
   apt:
@@ -34,40 +38,47 @@
     - docker-ce
     - docker-ce-cli
     - containerd.io
+  when: state == "present"
 
 - name: Checking docker is active
   service:
     name: docker
     state: started
     enabled: yes
+  when: state == "present"
 
 - name: Checking group "docker" exists
   ansible.builtin.group:
     name: docker
     state: present
+  when: state == "present"
 
 - name: Adding ssh user to docker group
   user:
     name: "{{ cluster_ssh_user }}"
     groups: docker
     append: yes
+  when: state == "present"
 
 - name: Pulling vyos docker image
   docker_image:
     name: "{{ vyos_container_image }}"
     source: pull
+  when: state == "present"
 
 - name: Starting vyos docker container
   docker_container:
     name: vyos
     image: "{{ vyos_container_image }}"
     detach: true
-    network_mode: host
+#    network_mode: bridge
+    ports: 0.0.0.0:80:8080
     privileged: true
     volumes:
       - /lib/modules:/lib/modules
       - /config:/opt/vyatta/etc/config
     entrypoint: /sbin/init
+  when: state == "present"
 
 #- name: Enabling HTTPS API
 #  community.docker.docker_container_exec:

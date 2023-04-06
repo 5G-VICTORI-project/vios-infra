@@ -9,7 +9,7 @@ app_sec_group: default
 cloud_key: ansible
 cloud_net_provider: provider
 osm_version: 13
-edge_name: bdbf2
+edge_name: bdbf3
 edge_vlan_range_start: 0
 edge_vlan_range_end: 0
 
@@ -34,7 +34,7 @@ workers_image: "{{ app_node_image }}"
 workers_flavor_name: "{{ app_node_base_flavor_name }}"
 vyos_hub_name: "{{ app_name }}-vyoshub"
 vyos_spoke_name: "{{ app_name }}-vyosspoke-{{ edge_name }}"
-vyos_image: "{{ app_node_image }}"
+vyos_image: vyos-1.4-rolling-202111090317-amd64
 vyos_flavor_name: "{{ app_node_base_flavor_name }}"
 vyos_container_image: vyos/image:1.4-rolling
 edge_node_name: "{{ app_name }}-edge-{{ edge_name }}"

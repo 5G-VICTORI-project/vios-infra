@@ -5,7 +5,7 @@
   pre_tasks:
     - name: Set variables
       set_fact:
-        state: present
+        state: false
   roles:
     - create-vyosspoke
 
@@ -13,5 +13,9 @@
   hosts: vyos
   gather_facts: false
   become: true
+  pre_tasks:
+    - name: Set variables
+      set_fact:
+        state: false
   roles:
     - config-vyos-common

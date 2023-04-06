@@ -14,7 +14,6 @@
     nics:
       - net-name: "{{ cluster_network_name }}"
     security_groups: "{{ cluster_security_group }}"
-  when: state == "present"
   register: vyos_instance
 
 - name: Updating ansible inventory with vyos spoke node
@@ -23,7 +22,6 @@
     ansible_ssh_host: "{{ vyos_instance.openstack.public_v4 }}"
     ansible_ssh_user: "{{ cluster_ssh_user }}"
     groupname: vyos
-  when: state == "present"
 
 - name: Waiting for vyos spoke node to boot up
   tags: bootstrap
