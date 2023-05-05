@@ -1,9 +1,9 @@
-app_node_image: ubuntu-20_04-image
+app_node_image: ubuntu2204-image
 app_node_base_flavor_name: m1.small
 app_node_key_flavor_name: m2.medium
 app_node_region: RegionOne
 app_node_az: nova
-app_remote_user: ubuntu
+app_remote_user: localadmin
 app_network: mgmt
 app_sec_group: default
 cloud_key: ansible

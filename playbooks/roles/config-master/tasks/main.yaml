@@ -32,20 +32,20 @@
   become: yes
   shell: "kubeadm init --pod-network-cidr={{ cluster_pod_subnet_cidr }} >> cluster_setup.txt"
   args:
-    chdir: /home/ubuntu
-    creates: cluster.txt
+    chdir: "/home/{{ cluster_ssh_user }}"
+    creates: cluster_setup.txt
 
 - name: Creating .kube directory for ssh user
   become_user: "{{ cluster_ssh_user }}"
   file:
-    path: $HOME/.kube
+    path: "/home/{{ cluster_ssh_user }}/.kube"
     state: directory
     mode: 0755
 
 - name: Copying admin.conf to ssh user's kube config
   copy:
     src: /etc/kubernetes/admin.conf
-    dest: /home/ubuntu/.kube/config
+    dest: "/home/{{ cluster_ssh_user }}/.kube/config"
     remote_src: yes
     owner: "{{ cluster_ssh_user }}"
 
@@ -54,7 +54,7 @@
   become_user: "{{ cluster_ssh_user }}"
   shell: kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml >> pod_setup.txt
   args:
-    chdir: $HOME
+    chdir: "/home/{{ cluster_ssh_user }}"
     creates: pod_setup.txt
 
 - name: Generating a kubernetes worker node join token
